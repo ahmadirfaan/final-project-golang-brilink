@@ -9,22 +9,25 @@ import (
 )
 
 type Config struct {
-	AppName        string
-	AppPort        string
-	LogLevel       string
-	Environment    string
-	JWTSecret      string
-	RedisAddress   string
-	DBUsername     string
-	DBPassword     string
-	DBHost         string
-	DBPort         int
-	DBName         string
-	MinioEndpoint  string
-	MinioAccessKey string
-	MinioSecretKey string
-	MinioRegion    string
-	MinioBucket    string
+	AppName                  string
+	AppPort                  string
+	LogLevel                 string
+	Environment              string
+	JWTSecret                string
+	RedisAddress             string
+	DBUsername               string
+	DBPassword               string
+	DBHost                   string
+	DBPort                   int
+	DBName                   string
+	MinioEndpoint            string
+	MinioAccessKey           string
+	MinioSecretKey           string
+	MinioRegion              string
+	MinioBucket              string
+	DBMaxConnections         int
+	DBMaxIdleConnections     int
+	DBMaxLifetimeConnections int
 }
 
 func Init() *Config {
@@ -43,11 +46,14 @@ func Init() *Config {
 		Environment: GetString("ENVIRONMENT"),
 		// JWTSecret:      GetString("JWT_SECRET"),
 		// RedisAddress:   GetString("REDIS_ADDRESS"),
-		DBUsername: GetString("DB_USERNAME"),
-		DBPassword: GetString("DB_PASSWORD"),
-		DBHost:     GetString("DB_HOST"),
-		DBPort:     GetInt("DB_PORT"),
-		DBName:     GetString("DB_NAME"),
+		DBUsername:               GetString("DB_USERNAME"),
+		DBPassword:               GetString("DB_PASSWORD"),
+		DBHost:                   GetString("DB_HOST"),
+		DBPort:                   GetInt("DB_PORT"),
+		DBName:                   GetString("DB_NAME"),
+		DBMaxConnections:         GetInt("DB_MAX_CONNECTIONS"),
+		DBMaxIdleConnections:     GetInt("DB_MAX_IDLE_CONNECTIONS"),
+		DBMaxLifetimeConnections: GetInt("DB_MAX_LIFETIME_CONNECTIONS"),
 		// MinioEndpoint:  GetString("MINIO_ENDPOINT"),
 		// MinioAccessKey: GetString("MINIO_ACCESS_KEY"),
 		// MinioSecretKey: GetString("MINIO_SECRET_KEY"),

@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/itp-backend/backend-b-antar-jemput/app"
 	"github.com/itp-backend/backend-b-antar-jemput/config"
+	databaseconn "github.com/itp-backend/backend-b-antar-jemput/config/database"
 	route "github.com/itp-backend/backend-b-antar-jemput/routes"
 	log "github.com/sirupsen/logrus"
 )
@@ -26,8 +27,8 @@ func (cli *Cli) Run(application *app.Application) {
 	fiberConfig := config.FiberConfig()
 	app := fiber.New(fiberConfig)
 
-	//set up connection
-	// connDB:= database.InitDb()
+	// set up connection
+	databaseconn.InitDb()
 
 	route.NotFoundRoute(app)
 

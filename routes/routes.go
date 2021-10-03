@@ -8,7 +8,7 @@ func NotFoundRoute(app *fiber.App) {
 
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"code": 404,
-				"msg":  "endpoint not found",
+				"msg":  "Not Found Route",
 			})
 		},
 	)
