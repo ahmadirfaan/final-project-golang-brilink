@@ -1,17 +1,14 @@
 package cli
 
 import (
-	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"os/signal"
-	"strings"
-	"syscall"
 
-	"github.com/rysmaadit/go-template/app"
-	"github.com/rysmaadit/go-template/router"
-	"github.com/rysmaadit/go-template/service"
+	"github.com/gofiber/fiber/v2"
+	"github.com/itp-backend/backend-b-antar-jemput/app"
+	"github.com/itp-backend/backend-b-antar-jemput/config"
+	route "github.com/itp-backend/backend-b-antar-jemput/routes"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -25,49 +22,39 @@ func NewCli(args []string) *Cli {
 	}
 }
 
-func (c *Cli) Run(application *app.Application) {
-	log.SetLevel(log.InfoLevel)
-	log.StandardLogger()
-	log.SetOutput(os.Stdout)
+func (cli *Cli) Run(application *app.Application) {
+	fiberConfig := config.FiberConfig()
+	app := fiber.New(fiberConfig)
 
-	if strings.ToLower(application.Config.LogLevel) == log.DebugLevel.String() {
-		log.SetLevel(log.DebugLevel)
-	}
+	//set up connection
+	// connDB:= database.InitDb()
 
-	log.SetReportCaller(true)
+	route.NotFoundRoute(app)
 
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%v", application.Config.AppPort),
-		Handler: router.NewRouter(service.InstantiateDependencies(application)),
-	}
+	StartServerWithGracefulShutdown(app, application.Config.AppPort)
 
-	log.Println(fmt.Sprintf("starting application { %v } on port :%v", application.Config.AppName, application.Config.AppPort))
-
-	go listenAndServe(srv)
-	waitForShutdown(srv)
 }
 
-func listenAndServe(apiServer *http.Server) {
-	err := apiServer.ListenAndServe()
+func StartServerWithGracefulShutdown(app *fiber.App, port string) {
+	appPort := fmt.Sprintf(`:%s`, port)
+	idleConnsClosed := make(chan struct{})
 
-	if err != nil {
-		log.WithField("error", err.Error()).Fatal("unable to serve")
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		<-sigint
+
+		if err := app.Shutdown(); err != nil {
+			log.Printf("Oops... Server is not shutting down! Reason: %v", err)
+		}
+
+		close(idleConnsClosed)
+	}()
+
+	// Run server.
+	if err := app.Listen(appPort); err != nil {
+		log.Printf("Oops... Server is not running! Reason: %v", err)
 	}
-}
 
-func waitForShutdown(apiServer *http.Server) {
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig,
-		syscall.SIGINT,
-		syscall.SIGTERM)
-
-	_ = <-sig
-
-	log.Warn("shutting down")
-
-	if err := apiServer.Shutdown(context.Background()); err != nil {
-		log.Println(err)
-	}
-
-	log.Warn("shutdown complete")
+	<-idleConnsClosed
 }

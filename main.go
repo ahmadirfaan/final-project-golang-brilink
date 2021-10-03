@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/rysmaadit/go-template/app"
-	"github.com/rysmaadit/go-template/cli"
 	"os"
+
+	"github.com/itp-backend/backend-b-antar-jemput/app"
 )
 
 func main() {
-	c := cli.NewCli(os.Args)
-	c.Run(app.Init())
+	c := cli.
+		c.Run(app.Init())
 }

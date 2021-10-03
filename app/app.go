@@ -1,8 +1,6 @@
 package app
 
-import (
-	"github.com/rysmaadit/go-template/config"
-)
+import "github.com/itp-backend/backend-b-antar-jemput/config"
 
 type Application struct {
 	Config *config.Config
