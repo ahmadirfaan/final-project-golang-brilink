@@ -8,18 +8,21 @@ import (
 )
 
 type LoginRepository interface {
-	Save(login database.Login, db *gorm.DB) (database.Login, error)
+	Save(login database.Login) (database.Login, error)
 }
 
-type LoginRepoImpl struct {
+type loginRepository struct {
+	DB *gorm.DB
 }
 
-func NewLoginRepository() LoginRepository {
-	return &LoginRepoImpl{}
+func NewLoginRepository(db *gorm.DB) LoginRepository {
+	return &loginRepository{
+		DB: db,
+	}
 }
 
-func (l LoginRepoImpl) Save(login database.Login, db *gorm.DB) (database.Login, error) {
-	err := db.Debug().Create(&login).Error
+func (l loginRepository) Save(login database.Login) (database.Login, error) {
+	err := l.DB.Debug().Create(&login).Error
 	log.Printf("Login:%+v\n", login)
 	return login, err
 }

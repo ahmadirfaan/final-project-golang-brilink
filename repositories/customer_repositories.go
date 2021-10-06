@@ -9,18 +9,21 @@ import (
 )
 
 type CustomerRepository interface {
-	Save(customer database.Customer, db *gorm.DB) (database.Customer, error)
+	Save(customer database.Customer) (database.Customer, error)
 }
 
-type CustomerRepoImpl struct {
+type customerRepository struct {
+	DB *gorm.DB
 }
 
-func NewCustomerRepository() CustomerRepository {
-	return &CustomerRepoImpl{}
+func NewCustomerRepository(db *gorm.DB) CustomerRepository {
+	return &customerRepository{
+		DB: db,
+	}
 }
 
-func (c CustomerRepoImpl) Save(customer database.Customer, db *gorm.DB) (database.Customer, error) {
-	err := db.Debug().Create(&customer).Error
+func (c customerRepository) Save(customer database.Customer) (database.Customer, error) {
+	err := c.DB.Debug().Create(&customer).Error
 	log.Printf("Customer Repositories:%+v\n ", customer)
 	fmt.Println(err)
 	return customer, err

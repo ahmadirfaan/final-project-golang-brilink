@@ -32,13 +32,18 @@ func (cli *Cli) Run(application *app.Application) {
 
 	// set up connection
 	db := databaseconn.InitDb()
-	loginRepo := repositories.NewLoginRepository()
-	userRepo := repositories.NewUserRepository()
-	customerRepo := repositories.NewCustomerRepository()
+	loginRepo := repositories.NewLoginRepository(db)
+	userRepo := repositories.NewUserRepository(db)
+	customerRepo := repositories.NewCustomerRepository(db)
 	customerService := service.NewCustomerService(customerRepo, userRepo, loginRepo, db)
 	customerController := controller.NewCustomerController(customerService)
 
+	//location controller
+	provinceRepo := repositories.NewProvinceRepository(db)
+	locationService := service.NewLocationService(provinceRepo)
+	locationController := controller.NewLocationController(locationService)
 	app.Post("/customer", customerController.RegisterCustomer)
+	app.Get("/location/provinces", locationController.GetAllProvinces)
 	route.NotFoundRoute(app)
 
 	StartServerWithGracefulShutdown(app, application.Config.AppPort)

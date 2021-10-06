@@ -8,18 +8,21 @@ import (
 )
 
 type AgentRepository interface {
-	Save(agent database.Agent, db *gorm.DB) (database.Agent, error)
+	Save(agent database.Agent) (database.Agent, error)
 }
 
-type AgentRepoImpl struct {
+type agentRepo struct {
+	DB *gorm.DB
 }
 
-func NewAgentRepository() AgentRepository {
-	return &AgentRepoImpl{}
+func NewAgentRepository(db *gorm.DB) AgentRepository {
+	return &agentRepo{
+		DB: db,
+	}
 }
 
-func (a AgentRepoImpl) Save(agent database.Agent, db *gorm.DB) (database.Agent, error) {
-	err := db.Debug().Create(&agent).Error
+func (a agentRepo) Save(agent database.Agent) (database.Agent, error) {
+	err := a.DB.Debug().Create(&agent).Error
 	log.Printf("Agent:%+v\n", agent)
 	return agent, err
 }

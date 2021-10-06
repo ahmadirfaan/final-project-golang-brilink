@@ -13,13 +13,13 @@ type CustomerController interface {
 }
 
 type customerController struct {
-	customerService service.CustomerService
+	CustomerService service.CustomerService
 }
 
 //NewCustomerController -> returns new customer controller
 func NewCustomerController(s service.CustomerService) CustomerController {
 	return customerController{
-		customerService: s,
+		CustomerService: s,
 	}
 }
 
@@ -28,19 +28,26 @@ func (cs customerController) RegisterCustomer(c *fiber.Ctx) error {
 	var customer web.RegisterCustomerRequest
 	if err := c.BodyParser(&customer); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    fiber.StatusBadRequest,
 			"message": err.Error(),
+			"data":    nil,
 		})
 	}
 
-	err := cs.customerService.RegisterCustomer(customer)
+	err := cs.CustomerService.RegisterCustomer(customer)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    fiber.StatusBadRequest,
 			"message": err.Error(),
+			"data":    nil,
 		})
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"code":    fiber.StatusCreated,
 		"message": "Sukses Membuat Akun",
+		"data": fiber.Map{
+			"token": customer.Username,
+		},
 	})
 }

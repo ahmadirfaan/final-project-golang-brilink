@@ -54,7 +54,7 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 		NoHandphone: request.NoHandphone,
 	}
 	// log.Println("Ini Customer sebelum di save: ", customer)
-	customer, err = c.customerRepository.Save(customer, tx)
+	customer, err = c.customerRepository.Save(customer)
 	if err != nil {
 		tx.Debug().Rollback()
 		return err
@@ -65,7 +65,7 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 		CustomerId: &customer.Id,
 	}
 	log.Printf("Ini CustomerId sebelum di save: %d, roleId: %d", user.CustomerId, user.RoleId)
-	user, err = c.userRepository.Save(user, tx)
+	user, err = c.userRepository.Save(user)
 	if err != nil {
 		fmt.Println(err)
 		tx.Rollback()
@@ -78,7 +78,7 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 		UserId:   user.Id,
 	}
 	log.Println("Ini Login sebelum di save: ", login)
-	login, err = c.loginRepository.Save(login, tx)
+	login, err = c.loginRepository.Save(login)
 	if err != nil {
 		tx.Debug().Rollback()
 		return err
