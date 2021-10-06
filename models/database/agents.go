@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Agents struct {
+type Agent struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
