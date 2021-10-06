@@ -7,8 +7,10 @@ import (
 
 	"github.com/itp-backend/backend-b-antar-jemput/app"
 	"github.com/itp-backend/backend-b-antar-jemput/models/database"
+	"github.com/itp-backend/backend-b-antar-jemput/repositories"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func InitDb() *gorm.DB {
@@ -22,7 +24,10 @@ func InitDb() *gorm.DB {
 	db_port := app.Config.DBPort
 	db_database := app.Config.DBName
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", db_user, db_pass, db_host, db_port, db_database)
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger:                 logger.Default,
+		SkipDefaultTransaction: true,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -41,11 +46,28 @@ func InitDb() *gorm.DB {
 }
 
 func InitCreateTable(db *gorm.DB) {
-	db.AutoMigrate(
+	db.Debug().Migrator().DropTable(
 		&database.Login{},
-		&database.Agents{},
+		&database.Agent{},
 		&database.Customer{},
 		&database.Role{},
 		&database.User{},
 	)
+	db.Debug().AutoMigrate(
+		&database.Login{},
+		&database.Agent{},
+		&database.Customer{},
+		&database.Role{},
+		&database.User{},
+	)
+	roleRepo := repositories.NewRoleRepository(db)
+	roleAdmin := database.Role{
+		Role: "Admin",
+	}
+	roleCustomer := database.Role{
+		Role: "Customer",
+	}
+	roleRepo.Save(roleAdmin)
+	roleRepo.Save(roleCustomer)
+
 }

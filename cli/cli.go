@@ -9,7 +9,10 @@ import (
 	"github.com/itp-backend/backend-b-antar-jemput/app"
 	"github.com/itp-backend/backend-b-antar-jemput/config"
 	databaseconn "github.com/itp-backend/backend-b-antar-jemput/config/database"
+	"github.com/itp-backend/backend-b-antar-jemput/controller"
+	"github.com/itp-backend/backend-b-antar-jemput/repositories"
 	route "github.com/itp-backend/backend-b-antar-jemput/routes"
+	"github.com/itp-backend/backend-b-antar-jemput/service"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,8 +31,14 @@ func (cli *Cli) Run(application *app.Application) {
 	app := fiber.New(fiberConfig)
 
 	// set up connection
-	databaseconn.InitDb()
+	db := databaseconn.InitDb()
+	loginRepo := repositories.NewLoginRepository()
+	userRepo := repositories.NewUserRepository()
+	customerRepo := repositories.NewCustomerRepository()
+	customerService := service.NewCustomerService(customerRepo, userRepo, loginRepo, db)
+	customerController := controller.NewCustomerController(customerService)
 
+	app.Post("/customer", customerController.RegisterCustomer)
 	route.NotFoundRoute(app)
 
 	StartServerWithGracefulShutdown(app, application.Config.AppPort)

@@ -13,10 +13,10 @@ type User struct {
 	Id         uint           `gorm:"autoIncrement;primary key"`
 	RoleId     uint
 	Role       Role `gorm:"foreignkey:RoleId;references:Id"`
-	CustomerId uint
+	CustomerId *uint
 	// Belong to CustomerId
 	Customer Customer `gorm:"foreignkey:CustomerId;references:Id"`
-	AgentId  uint
+	AgentId  *uint
 	// Belong to AgentId
-	Agent Agents `gorm:"foreignkey:AgentId;references:Id"`
+	Agent Agent `gorm:"foreignkey:AgentId;references:Id"`
 }
