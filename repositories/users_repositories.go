@@ -10,6 +10,7 @@ import (
 
 type UserRepository interface {
 	Save(user database.User) (database.User, error)
+    WithTrx(trxHandle *gorm.DB) userRepository
 }
 
 type userRepository struct {
@@ -28,4 +29,13 @@ func (u userRepository) Save(user database.User) (database.User, error) {
 	fmt.Println(err)
 	log.Printf("Users Repositories:%+v\n", user)
 	return user, err
+}
+
+func (u userRepository) WithTrx(trxHandle *gorm.DB) userRepository {
+    if trxHandle == nil {
+        log.Print("Transaction Database not found")
+        return u
+    }
+    u.DB = trxHandle
+    return u
 }

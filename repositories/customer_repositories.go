@@ -10,6 +10,7 @@ import (
 
 type CustomerRepository interface {
 	Save(customer database.Customer) (database.Customer, error)
+    WithTrx(trxHandle *gorm.DB) customerRepository
 }
 
 type customerRepository struct {
@@ -27,4 +28,13 @@ func (c customerRepository) Save(customer database.Customer) (database.Customer,
 	log.Printf("Customer Repositories:%+v\n ", customer)
 	fmt.Println(err)
 	return customer, err
+}
+
+func (c customerRepository) WithTrx(trxHandle *gorm.DB) customerRepository {
+    if trxHandle == nil {
+        log.Print("Transaction Database not found")
+        return c
+    }
+    c.DB = trxHandle
+    return c
 }
