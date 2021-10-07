@@ -32,10 +32,9 @@ func (cli *Cli) Run(application *app.Application) {
 
 	// set up connection
 	db := databaseconn.InitDb()
-	loginRepo := repositories.NewLoginRepository(db)
 	userRepo := repositories.NewUserRepository(db)
 	customerRepo := repositories.NewCustomerRepository(db)
-	customerService := service.NewCustomerService(customerRepo, userRepo, loginRepo, db)
+	customerService := service.NewCustomerService(customerRepo, userRepo, db)
 	customerController := controller.NewCustomerController(customerService)
 
 	//location controller

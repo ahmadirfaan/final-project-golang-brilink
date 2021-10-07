@@ -11,10 +11,9 @@ type Agent struct {
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
 	Id          uint           `gorm:"autoIncrement;primary key"`
-	AgentName   string         `gorm:"varchar(250);not null"`
-	Address     string         `gorm:"type:text;not null"`
-	Province    string         `gorm:"varchar(250);not null"`
-	City        string         `gorm:"varchar(250);not null"`
-	District    string         `gorm:"varchar(250);not null"`
-	NoHandphone string         `gorm:"varchar(12);not null"`
+	AgentName   string         `gorm:"type:varchar(250);not null"`
+	DistrictId  string         `gorm:"type:char(7);not null"`
+	Address     string `gorm:"type:text;not null"`
+	NoHandphone string `gorm:"type:varchar(12);not null"`
+	Rating      uint8  `gorm:"type:tinyint"`
 }

@@ -11,5 +11,5 @@ type Role struct {
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 	Id        uint           `gorm:"autoIncrement;primary key"`
-	Role      string         `gorm:"varchar(50)"`
+	Role      string         `gorm:"type:varchar(50)"`
 }

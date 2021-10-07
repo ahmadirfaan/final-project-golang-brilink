@@ -46,20 +46,16 @@ func InitDb() *gorm.DB {
 }
 
 func InitCreateTable(db *gorm.DB) {
-	db.Debug().Migrator().DropTable(
-		&database.Login{},
-		&database.Agent{},
-		&database.Customer{},
-		&database.Role{},
-		&database.User{},
-	)
+
 	db.Debug().AutoMigrate(
-		&database.Login{},
-		&database.Agent{},
-		&database.Customer{},
-		&database.Role{},
+        &database.Role{},
+        &database.Agent{},
+        &database.Customer{},
 		&database.User{},
-	)
+        &database.ServiceTypeTransaction{},
+        &database.TransactionType{},
+        &database.Transactions{},
+    )
 	roleRepo := repositories.NewRoleRepository(db)
 	roleAdmin := database.Role{
 		Role: "Admin",
