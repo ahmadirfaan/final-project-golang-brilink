@@ -39,12 +39,14 @@ func (cli *Cli) Run(application *app.Application) {
 
 	//location controller
 	provinceRepo := repositories.NewProvinceRepository(db)
-	locationService := service.NewLocationService(provinceRepo)
+    regencyRepo := repositories.NewRegencyRepository(db)
+	locationService := service.NewLocationService(provinceRepo, regencyRepo)
 	locationController := controller.NewLocationController(locationService)
 	app.Post("/customer", customerController.RegisterCustomer)
 	app.Get("/location/provinces", locationController.GetAllProvinces)
+	app.Get("/location", locationController.GetAllRegenciesByProvinceId)
 	route.NotFoundRoute(app)
-
+    log.Println("Server jalan: ")
 	StartServerWithGracefulShutdown(app, application.Config.AppPort)
 
 }
