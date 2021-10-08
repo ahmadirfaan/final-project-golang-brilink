@@ -37,6 +37,10 @@ func (cli *Cli) Run(application *app.Application) {
 	customerService := service.NewCustomerService(customerRepo, userRepo, db)
 	customerController := controller.NewCustomerController(customerService)
 
+	agentRepo := repositories.NewAgentRepository(db)
+	agentService := service.NewAgentService(agentRepo, userRepo, db)
+	agentController := controller.NewAgentController(agentService)
+
 	//location controller
 	provinceRepo := repositories.NewProvinceRepository(db)
     regencyRepo := repositories.NewRegencyRepository(db)
@@ -44,6 +48,9 @@ func (cli *Cli) Run(application *app.Application) {
 	locationController := controller.NewLocationController(locationService)
 	app.Post("/customer", customerController.RegisterCustomer)
 	app.Get("/location/provinces", locationController.GetAllProvinces)
+	app.Post("/agent", agentController.RegisterAgent)
+	route.NotFoundRoute(app)
+	log.Println(app.Server())
 	app.Get("/location", locationController.GetAllRegenciesByProvinceId)
 	route.NotFoundRoute(app)
     log.Println("Server jalan: ")
