@@ -46,8 +46,6 @@ func (cs customerController) RegisterCustomer(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"code":    fiber.StatusCreated,
 		"message": "Sukses Membuat Akun",
-		"data": fiber.Map{
-			"token": customer.Username,
-		},
+		"data": nil,
 	})
 }
