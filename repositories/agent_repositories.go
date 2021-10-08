@@ -9,6 +9,7 @@ import (
 
 type AgentRepository interface {
 	Save(agent database.Agent) (database.Agent, error)
+	WithTrx(trxHandle *gorm.DB) agentRepo
 }
 
 type agentRepo struct {
@@ -25,4 +26,13 @@ func (a agentRepo) Save(agent database.Agent) (database.Agent, error) {
 	err := a.DB.Debug().Create(&agent).Error
 	log.Printf("Agent:%+v\n", agent)
 	return agent, err
+}
+
+func (a agentRepo) WithTrx(trxHandle *gorm.DB) agentRepo {
+	if trxHandle == nil {
+		log.Print("Transaction Database not found")
+		return a
+	}
+	a.DB = trxHandle
+	return a
 }

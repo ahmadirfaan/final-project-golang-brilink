@@ -59,8 +59,8 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 	user := database.User{
 		RoleId:     2,
 		CustomerId: &customer.Id,
-        Username: request.Username,
-        Password: request.Password,
+		Username:   request.Username,
+		Password:   request.Password,
 	}
 	//log.Printf("Ini CustomerId sebelum di save: %d, roleId: %d", user.CustomerId, user.RoleId)
 	user, err = c.userRepository.WithTrx(tx).Save(user)
@@ -69,6 +69,6 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 		tx.Rollback()
 		return err
 	}
-    //log.Println("Ini Harusnya Commit: ", request)
+	//log.Println("Ini Harusnya Commit: ", request)
 	return tx.Commit().Error
 }

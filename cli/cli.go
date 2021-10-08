@@ -35,23 +35,35 @@ func (cli *Cli) Run(application *app.Application) {
     //Repository
 	userRepo := repositories.NewUserRepository(db)
 	customerRepo := repositories.NewCustomerRepository(db)
-    provinceRepo := repositories.NewProvinceRepository(db)
-    regencyRepo := repositories.NewRegencyRepository(db)
-    // Service
+  provinceRepo := repositories.NewProvinceRepository(db)
+  regencyRepo := repositories.NewRegencyRepository(db)
+  agentRepo := repositories.NewAgentRepository(db)
+
+  // Service
 	customerService := service.NewCustomerService(customerRepo, userRepo, db)
-    locationService := service.NewLocationService(provinceRepo, regencyRepo)
-    loginService := service.NewLoginService(userRepo)
-    // Controller
-    customerController := controller.NewCustomerController(customerService)
-    locationController := controller.NewLocationController(locationService)
-    loginController := controller.NewLoginController(loginService)
-    route.LoggerRoute(appFiber)
-    appFiber.Post("/customer", customerController.RegisterCustomer)
+  locationService := service.NewLocationService(provinceRepo, regencyRepo)
+  loginService := service.NewLoginService(userRepo)
+  agentService := service.NewAgentService(agentRepo, userRepo, db)
+
+  // Controller
+  customerController := controller.NewCustomerController(customerService)
+  locationController := controller.NewLocationController(locationService)
+  loginController := controller.NewLoginController(loginService)
+  agentController := controller.NewAgentController(agentService)
+  
+  // Route
+  route.LoggerRoute(appFiber)
+  appFiber.Post("/customer", customerController.RegisterCustomer)
+  app.Post("/agent", agentController.RegisterAgent)
 	appFiber.Get("/location/provinces", locationController.GetAllProvinces)
 	appFiber.Get("/location", locationController.GetAllRegenciesByProvinceId)
-    appFiber.Post("/login", loginController.Login)
-    route.NotFoundRoute(appFiber)
-    StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
+  appFiber.Post("/login", loginController.Login)
+  route.NotFoundRoute(appFiber)
+  
+  StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
+	route.NotFoundRoute(app)
+	log.Println(app.Server())
+	StartServerWithGracefulShutdown(app, application.Config.AppPort)
 
 }
 

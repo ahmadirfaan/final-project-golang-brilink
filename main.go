@@ -10,4 +10,5 @@ import (
 func main() {
 	c := cli.NewCli(os.Args)
 	c.Run(app.Init())
+
 }
