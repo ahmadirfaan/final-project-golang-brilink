@@ -7,19 +7,18 @@ import (
 
 type LocationService interface {
 	GetAllLocationProvince() ([]database.Provinces, error)
-    GetAllRegencyByProvince(provinceId string) ([]database.Regencies, error)
+	GetAllRegencyByProvince(provinceId string) ([]database.Regencies, error)
 }
 
 type locationService struct {
 	ProvinceRepository repositories.ProvinceRepository
-    RegencyRepository repositories.RegencyRepository
-
+	RegencyRepository  repositories.RegencyRepository
 }
 
 func NewLocationService(pr repositories.ProvinceRepository, rr repositories.RegencyRepository) LocationService {
 	return &locationService{
 		ProvinceRepository: pr,
-        RegencyRepository: rr,
+		RegencyRepository:  rr,
 	}
 }
 
@@ -29,7 +28,6 @@ func (l *locationService) GetAllLocationProvince() ([]database.Provinces, error)
 }
 
 func (l *locationService) GetAllRegencyByProvince(provinceId string) ([]database.Regencies, error) {
-    regencies, err := l.RegencyRepository.FindByProvinceId(provinceId)
-    return regencies, err
+	regencies, err := l.RegencyRepository.FindByProvinceId(provinceId)
+	return regencies, err
 }
-
