@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"log"
+    "github.com/itp-backend/backend-b-antar-jemput/models/web"
+    "log"
 
-	"github.com/gofiber/fiber/v2"
-	web "github.com/itp-backend/backend-b-antar-jemput/models/web/customer"
-	"github.com/itp-backend/backend-b-antar-jemput/service"
+    "github.com/gofiber/fiber/v2"
+    "github.com/itp-backend/backend-b-antar-jemput/service"
 )
 
 type CustomerController interface {
