@@ -1,12 +1,12 @@
 package service
 
 import (
-    "fmt"
-    "github.com/itp-backend/backend-b-antar-jemput/models/database"
-    web "github.com/itp-backend/backend-b-antar-jemput/models/web/customer"
-    "github.com/itp-backend/backend-b-antar-jemput/repositories"
-    "github.com/itp-backend/backend-b-antar-jemput/utils"
-    "gorm.io/gorm"
+	"fmt"
+	"github.com/itp-backend/backend-b-antar-jemput/models/database"
+	web "github.com/itp-backend/backend-b-antar-jemput/models/web/customer"
+	"github.com/itp-backend/backend-b-antar-jemput/repositories"
+	"github.com/itp-backend/backend-b-antar-jemput/utils"
+	"gorm.io/gorm"
 )
 
 type CustomerService interface {
@@ -59,8 +59,8 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 	user := database.User{
 		RoleId:     2,
 		CustomerId: &customer.Id,
-        Username: request.Username,
-        Password: request.Password,
+		Username:   request.Username,
+		Password:   request.Password,
 	}
 	//log.Printf("Ini CustomerId sebelum di save: %d, roleId: %d", user.CustomerId, user.RoleId)
 	user, err = c.userRepository.WithTrx(tx).Save(user)
@@ -69,6 +69,6 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 		tx.Rollback()
 		return err
 	}
-    //log.Println("Ini Harusnya Commit: ", request)
+	//log.Println("Ini Harusnya Commit: ", request)
 	return tx.Commit().Error
 }
