@@ -1,16 +1,15 @@
 package databaseconn
 
 import (
-	"fmt"
-	"log"
-	"time"
+    "fmt"
+    "log"
+    "time"
 
-	"github.com/itp-backend/backend-b-antar-jemput/app"
-	"github.com/itp-backend/backend-b-antar-jemput/models/database"
-	"github.com/itp-backend/backend-b-antar-jemput/repositories"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+    "github.com/itp-backend/backend-b-antar-jemput/app"
+    "github.com/itp-backend/backend-b-antar-jemput/models/database"
+    "gorm.io/driver/mysql"
+    "gorm.io/gorm"
+    "gorm.io/gorm/logger"
 )
 
 func InitDb() *gorm.DB {
@@ -46,28 +45,27 @@ func InitDb() *gorm.DB {
 }
 
 func InitCreateTable(db *gorm.DB) {
-	db.Debug().Migrator().DropTable(
-		&database.Login{},
-		&database.Agent{},
-		&database.Customer{},
-		&database.Role{},
-		&database.User{},
-	)
+
 	db.Debug().AutoMigrate(
-		&database.Login{},
-		&database.Agent{},
-		&database.Customer{},
-		&database.Role{},
+        &database.Role{},
+        &database.Agent{},
+        &database.Customer{},
 		&database.User{},
-	)
-	roleRepo := repositories.NewRoleRepository(db)
-	roleAdmin := database.Role{
-		Role: "Admin",
-	}
-	roleCustomer := database.Role{
-		Role: "Customer",
-	}
-	roleRepo.Save(roleAdmin)
-	roleRepo.Save(roleCustomer)
+        &database.ServiceTypeTransaction{},
+        &database.TransactionType{},
+        &database.Transactions{},
+    )
+    /**
+    Untuk menjalankan pertama kali supaya tersimpan data role dan admin
+     */
+	//roleRepo := repositories.NewRoleRepository(db)
+	//roleAdmin := database.Role{
+	//	Role: "Admin",
+	//}
+	//roleCustomer := database.Role{
+	//	Role: "Customer",
+	//}
+	//roleRepo.Save(roleAdmin)
+	//roleRepo.Save(roleCustomer)
 
 }

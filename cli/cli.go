@@ -1,19 +1,19 @@
 package cli
 
 import (
-	"fmt"
-	"os"
-	"os/signal"
+    "fmt"
+    route "github.com/itp-backend/backend-b-antar-jemput/routes"
+    "os"
+    "os/signal"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/itp-backend/backend-b-antar-jemput/app"
-	"github.com/itp-backend/backend-b-antar-jemput/config"
-	databaseconn "github.com/itp-backend/backend-b-antar-jemput/config/database"
-	"github.com/itp-backend/backend-b-antar-jemput/controller"
-	"github.com/itp-backend/backend-b-antar-jemput/repositories"
-	route "github.com/itp-backend/backend-b-antar-jemput/routes"
-	"github.com/itp-backend/backend-b-antar-jemput/service"
-	log "github.com/sirupsen/logrus"
+    "github.com/gofiber/fiber/v2"
+    "github.com/itp-backend/backend-b-antar-jemput/app"
+    "github.com/itp-backend/backend-b-antar-jemput/config"
+    databaseconn "github.com/itp-backend/backend-b-antar-jemput/config/database"
+    "github.com/itp-backend/backend-b-antar-jemput/controller"
+    "github.com/itp-backend/backend-b-antar-jemput/repositories"
+    "github.com/itp-backend/backend-b-antar-jemput/service"
+    log "github.com/sirupsen/logrus"
 )
 
 type Cli struct {
@@ -28,19 +28,41 @@ func NewCli(args []string) *Cli {
 
 func (cli *Cli) Run(application *app.Application) {
 	fiberConfig := config.FiberConfig()
-	app := fiber.New(fiberConfig)
+	appFiber := fiber.New(fiberConfig)
 
 	// set up connection
 	db := databaseconn.InitDb()
-	loginRepo := repositories.NewLoginRepository()
-	userRepo := repositories.NewUserRepository()
-	customerRepo := repositories.NewCustomerRepository()
-	customerService := service.NewCustomerService(customerRepo, userRepo, loginRepo, db)
-	customerController := controller.NewCustomerController(customerService)
+    //Repository
+	userRepo := repositories.NewUserRepository(db)
+	customerRepo := repositories.NewCustomerRepository(db)
+  provinceRepo := repositories.NewProvinceRepository(db)
+  regencyRepo := repositories.NewRegencyRepository(db)
+  agentRepo := repositories.NewAgentRepository(db)
 
-	app.Post("/customer", customerController.RegisterCustomer)
+  // Service
+	customerService := service.NewCustomerService(customerRepo, userRepo, db)
+  locationService := service.NewLocationService(provinceRepo, regencyRepo)
+  loginService := service.NewLoginService(userRepo)
+  agentService := service.NewAgentService(agentRepo, userRepo, db)
+
+  // Controller
+  customerController := controller.NewCustomerController(customerService)
+  locationController := controller.NewLocationController(locationService)
+  loginController := controller.NewLoginController(loginService)
+  agentController := controller.NewAgentController(agentService)
+  
+  // Route
+  route.LoggerRoute(appFiber)
+  appFiber.Post("/customer", customerController.RegisterCustomer)
+  app.Post("/agent", agentController.RegisterAgent)
+	appFiber.Get("/location/provinces", locationController.GetAllProvinces)
+	appFiber.Get("/location", locationController.GetAllRegenciesByProvinceId)
+  appFiber.Post("/login", loginController.Login)
+  route.NotFoundRoute(appFiber)
+  
+  StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 	route.NotFoundRoute(app)
-
+	log.Println(app.Server())
 	StartServerWithGracefulShutdown(app, application.Config.AppPort)
 
 }
