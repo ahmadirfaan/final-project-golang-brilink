@@ -1,11 +1,13 @@
 package controller
 
 import (
-	"log"
-
-	"github.com/gofiber/fiber/v2"
-	web "github.com/itp-backend/backend-b-antar-jemput/models/web/agent"
-	"github.com/itp-backend/backend-b-antar-jemput/service"
+    "errors"
+    "github.com/go-playground/validator"
+    "github.com/go-sql-driver/mysql"
+    "github.com/gofiber/fiber/v2"
+    "github.com/itp-backend/backend-b-antar-jemput/models/web"
+    "github.com/itp-backend/backend-b-antar-jemput/service"
+    "github.com/itp-backend/backend-b-antar-jemput/utils"
 )
 
 type AgentController interface {
@@ -23,23 +25,31 @@ func NewAgentController(s service.AgentService) AgentController {
 }
 
 func (as agentController) RegisterAgent(c *fiber.Ctx) error {
-	log.Print("[AgentController]...add Agent")
 	var agent web.RegisterAgentRequest
 	if err := c.BodyParser(&agent); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code":    fiber.StatusBadRequest,
-			"message": err.Error(),
+			"message": "Error for handling your request",
 			"data":    nil,
 		})
 	}
 
 	err := as.AgentService.RegisterAgent(agent)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code":    fiber.StatusBadRequest,
-			"message": err.Error(),
-			"data":    nil,
-		})
+        var mysqlErr *mysql.MySQLError
+        if errors.As(err, &validator.ValidationErrors{}) {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code":    fiber.StatusBadRequest,
+                "message": utils.ValidatorErrors(err),
+                "data":    nil,
+            })
+        } else if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+            return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+                "code":    fiber.StatusConflict,
+                "message": "Username Already is exist",
+                "data":    nil,
+            })
+        }
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{

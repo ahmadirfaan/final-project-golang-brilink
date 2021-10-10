@@ -37,6 +37,7 @@ func (lc locationController) GetAllProvinces(c *fiber.Ctx) error {
 	})
 }
 
+
 func (lc locationController) GetAllRegenciesByProvinceId(c *fiber.Ctx) error {
     provinceId := c.Query("provinceId")
     if provinceId == "" {
@@ -48,9 +49,9 @@ func (lc locationController) GetAllRegenciesByProvinceId(c *fiber.Ctx) error {
     }
     regencies, err := lc.LocationService.GetAllRegencyByProvince(provinceId)
     if err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-            "code":    fiber.StatusBadRequest,
-            "message": err.Error(),
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "code":    fiber.StatusInternalServerError,
+            "message": "There is errors in server",
             "data":    nil,
         })
     }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/itp-backend/backend-b-antar-jemput/models/database"
-	web "github.com/itp-backend/backend-b-antar-jemput/models/web/agent"
+	"github.com/itp-backend/backend-b-antar-jemput/models/web"
 	"github.com/itp-backend/backend-b-antar-jemput/repositories"
 	"github.com/itp-backend/backend-b-antar-jemput/utils"
 	"gorm.io/gorm"
