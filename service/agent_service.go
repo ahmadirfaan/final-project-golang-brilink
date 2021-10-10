@@ -57,7 +57,7 @@ func (a *agentService) RegisterAgent(request web.RegisterAgentRequest) error {
 		RoleId:   1,
 		AgentId:  &agent.Id,
 		Username: request.Username,
-		Password: request.Password,
+		Password: utils.HashPassword(request.Password),
 	}
 	user, err = a.userRepository.WithTrx(tx).Save(user)
 	if err != nil {

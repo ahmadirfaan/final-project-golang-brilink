@@ -1,10 +1,12 @@
 package service
 
 import (
+    "errors"
     "github.com/itp-backend/backend-b-antar-jemput/models/database"
     "github.com/itp-backend/backend-b-antar-jemput/models/web"
     "github.com/itp-backend/backend-b-antar-jemput/repositories"
     "github.com/itp-backend/backend-b-antar-jemput/utils"
+    "log"
 )
 
 type LoginService interface {
@@ -26,6 +28,13 @@ func (l *loginService) Login(request web.LoginRequest) (database.User, error) {
     if err != nil {
         return database.User{},err
     }
-    user, err := l.UserRepository.CheckUsernameAndPassword(request.Username, request.Password, request.Role)
+    log.Println("Request Password: ", request.Password)
+    user, err := l.UserRepository.CheckUsernameAndPassword(request.Username, request.Role)
+    checkPassword := utils.CheckPasswordHash(request.Password, user.Password)
+    log.Println("Hash Password Database: ", user.Password)
+    log.Println("Check Password in Database: ", checkPassword)
+    if !checkPassword {
+        return database.User{}, errors.New("There is no match record in our database")
+    }
     return user, err
 }
