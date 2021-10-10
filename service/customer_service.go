@@ -27,6 +27,7 @@ func NewCustomerService(cr repositories.CustomerRepository, ur repositories.User
 	}
 }
 
+// RegisterCustomer function service for handling register customer
 func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) error {
 	err := utils.NewValidator().Struct(&request)
 	if err != nil {

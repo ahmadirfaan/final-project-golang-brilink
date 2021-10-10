@@ -5,13 +5,14 @@ import (
 )
 func NewValidator() *validator.Validate {
 	validate := validator.New()
-	return validate 
+	return validate
 }
 
-func ValidatorErrors(err error) map[string] string {
-	fields := map[string]string{}
+func ValidatorErrors(err error) string {
+    var errorMessage string
 	for _, err := range err.(validator.ValidationErrors){
-		fields[err.Field()] = err.Field()
+		errorMessage = "Error in field: " + err.Field()
 	}
-	return fields
+    return errorMessage
+
 }
