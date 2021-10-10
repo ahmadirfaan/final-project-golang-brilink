@@ -24,6 +24,7 @@ func NewAgentController(s service.AgentService) AgentController {
 	}
 }
 
+
 func (as agentController) RegisterAgent(c *fiber.Ctx) error {
 	var agent web.RegisterAgentRequest
 	if err := c.BodyParser(&agent); err != nil {

@@ -5,6 +5,6 @@ type RegisterAgentRequest struct {
 	Password    string `json:"password" validate:"required,min=8,max=100"`
 	AgentName   string `json:"agentName" validate:"required"`
 	NoHandphone string `json:"noHandphone" validate:"required,min=9,max=12,numeric"`
-	DistrictId  string `json:"districtId" validate:"required,min=7,numeric"`
+	DistrictId  string `json:"districtId" validate:"required,length=7, numeric"`
 	Address     string `json:"address" validate:"required"`
 }

@@ -1,10 +1,12 @@
 package controller
 
 import (
+    "errors"
+    "github.com/go-playground/validator"
     "github.com/gofiber/fiber/v2"
     "github.com/itp-backend/backend-b-antar-jemput/models/web"
     "github.com/itp-backend/backend-b-antar-jemput/service"
-    "log"
+    "github.com/itp-backend/backend-b-antar-jemput/utils"
 )
 
 type LoginController interface {
@@ -33,19 +35,35 @@ func (cs loginController) Login(c *fiber.Ctx) error {
 
     user, err := cs.LoginService.Login(login)
     if err != nil || user.Id == 0 {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-            "code":    fiber.StatusBadRequest,
+        if errors.As(err, &validator.ValidationErrors{}) {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code":    fiber.StatusBadRequest,
+                "message": utils.ValidatorErrors(err),
+                "data":    nil,
+            })
+        } else {
+            return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+                "code":    fiber.StatusUnauthorized,
+                "message": err.Error(),
+                "data":    nil,
+            })
+        }
+
+    }
+
+    token, err := utils.GenerateToken(user)
+    if err != nil { //Error that because of generates token
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "code":    fiber.StatusInternalServerError,
             "message": err.Error(),
             "data":    nil,
         })
     }
-    log.Println("User: ", user)
-    return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-        "code":    fiber.StatusCreated,
-        "message": nil,
+    return c.Status(fiber.StatusOK).JSON(fiber.Map{
+        "code":    fiber.StatusOK,
+        "message": "Sucess Login",
         "data": fiber.Map{
-            "role": user.Role.Role,
-            "userId": user.Id,
+            "accessToken": token,
         },
     })
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/itp-backend/backend-b-antar-jemput/cli"
 )
 
+
 func main() {
 	c := cli.NewCli(os.Args)
 	c.Run(app.Init())

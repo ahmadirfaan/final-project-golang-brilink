@@ -54,17 +54,15 @@ func (cli *Cli) Run(application *app.Application) {
 
 	// Route
     middleware.LoggerRoute(appFiber)
+    appFiber.Post("/login", loginController.Login)
     appFiber.Post("/customer", customerController.RegisterCustomer)
-	appFiber.Post("/agent", agentController.RegisterAgent)
-	appFiber.Get("/location/provinces", locationController.GetAllProvinces)
+    appFiber.Post("/agent", agentController.RegisterAgent)
+    // Set Middleware Auth with JWT Config
+    middleware.MiddlewareAuth(appFiber)
+    appFiber.Get("/location/provinces", locationController.GetAllProvinces)
 	appFiber.Get("/location", locationController.GetAllRegenciesByProvinceId)
-	appFiber.Post("/login", loginController.Login)
-	route.NotFoundRoute(appFiber)
-
+    route.NotFoundRoute(appFiber)
     StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
-	route.NotFoundRoute(appFiber)
-	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
-
 }
 
 func StartServerWithGracefulShutdown(app *fiber.App, port string) {

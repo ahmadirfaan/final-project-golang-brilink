@@ -6,6 +6,8 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gofiber/fiber/v2 v2.20.1
+	github.com/gofiber/jwt/v3 v3.1.2
+	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/subosito/gotenv v1.2.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
