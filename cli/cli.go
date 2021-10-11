@@ -1,20 +1,21 @@
 package cli
 
 import (
-    "fmt"
-    "github.com/itp-backend/backend-b-antar-jemput/middleware"
-    route "github.com/itp-backend/backend-b-antar-jemput/routes"
-    "os"
-    "os/signal"
+	"fmt"
+	"os"
+	"os/signal"
 
-    "github.com/gofiber/fiber/v2"
-    "github.com/itp-backend/backend-b-antar-jemput/app"
-    "github.com/itp-backend/backend-b-antar-jemput/config"
-    databaseconn "github.com/itp-backend/backend-b-antar-jemput/config/database"
-    "github.com/itp-backend/backend-b-antar-jemput/controller"
-    "github.com/itp-backend/backend-b-antar-jemput/repositories"
-    "github.com/itp-backend/backend-b-antar-jemput/service"
-    log "github.com/sirupsen/logrus"
+	"github.com/itp-backend/backend-b-antar-jemput/middleware"
+	route "github.com/itp-backend/backend-b-antar-jemput/routes"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/itp-backend/backend-b-antar-jemput/app"
+	"github.com/itp-backend/backend-b-antar-jemput/config"
+	databaseconn "github.com/itp-backend/backend-b-antar-jemput/config/database"
+	"github.com/itp-backend/backend-b-antar-jemput/controller"
+	"github.com/itp-backend/backend-b-antar-jemput/repositories"
+	"github.com/itp-backend/backend-b-antar-jemput/service"
+	log "github.com/sirupsen/logrus"
 )
 
 type Cli struct {
@@ -39,10 +40,11 @@ func (cli *Cli) Run(application *app.Application) {
 	provinceRepo := repositories.NewProvinceRepository(db)
 	regencyRepo := repositories.NewRegencyRepository(db)
 	agentRepo := repositories.NewAgentRepository(db)
+	districtRepo := repositories.NewDistrictRepository(db)
 
 	// Service
 	customerService := service.NewCustomerService(customerRepo, userRepo, db)
-	locationService := service.NewLocationService(provinceRepo, regencyRepo)
+	locationService := service.NewLocationService(provinceRepo, regencyRepo, districtRepo)
 	loginService := service.NewLoginService(userRepo)
 	agentService := service.NewAgentService(agentRepo, userRepo, db)
 
@@ -53,15 +55,17 @@ func (cli *Cli) Run(application *app.Application) {
 	agentController := controller.NewAgentController(agentService)
 
 	// Route
-    middleware.LoggerRoute(appFiber)
-    appFiber.Post("/customer", customerController.RegisterCustomer)
+	middleware.LoggerRoute(appFiber)
+	appFiber.Post("/customer", customerController.RegisterCustomer)
 	appFiber.Post("/agent", agentController.RegisterAgent)
 	appFiber.Get("/location/provinces", locationController.GetAllProvinces)
 	appFiber.Get("/location", locationController.GetAllRegenciesByProvinceId)
+	appFiber.Get("/location/regencies", locationController.GetAllRegencies)
+	appFiber.Get("/location/districts", locationController.GetAllDistrictsByRegencyId)
 	appFiber.Post("/login", loginController.Login)
 	route.NotFoundRoute(appFiber)
 
-    StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
+	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 	route.NotFoundRoute(appFiber)
 	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 

@@ -1,6 +1,6 @@
 module github.com/itp-backend/backend-b-antar-jemput
 
-go 1.17
+go 1.16
 
 require (
 	github.com/go-playground/validator v9.31.0+incompatible
