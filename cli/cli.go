@@ -41,18 +41,21 @@ func (cli *Cli) Run(application *app.Application) {
 	regencyRepo := repositories.NewRegencyRepository(db)
 	agentRepo := repositories.NewAgentRepository(db)
 	districtRepo := repositories.NewDistrictRepository(db)
+	transactionRepo := repositories.NewTransactionRepository(db)
 
 	// Service
 	customerService := service.NewCustomerService(customerRepo, userRepo, db)
 	locationService := service.NewLocationService(provinceRepo, regencyRepo, districtRepo)
 	loginService := service.NewLoginService(userRepo)
 	agentService := service.NewAgentService(agentRepo, userRepo, db)
+	transactionService := service.NewTransacrtionService(transactionRepo, db)
 
 	// Controller
 	customerController := controller.NewCustomerController(customerService)
 	locationController := controller.NewLocationController(locationService)
 	loginController := controller.NewLoginController(loginService)
 	agentController := controller.NewAgentController(agentService)
+	transactionController := controller.NewTransacrtionController(transactionService)
 
 	// Route
 	middleware.LoggerRoute(appFiber)
@@ -63,6 +66,8 @@ func (cli *Cli) Run(application *app.Application) {
 	appFiber.Get("/location/regencies", locationController.GetAllRegencies)
 	appFiber.Get("/location/districts", locationController.GetAllDistrictsByRegencyId)
 	appFiber.Post("/login", loginController.Login)
+	appFiber.Post("/transaction", transactionController.CreateTransaction)
+
 	route.NotFoundRoute(appFiber)
 
 	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)

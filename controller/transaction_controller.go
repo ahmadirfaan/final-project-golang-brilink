@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+
 	"github.com/go-playground/validator"
 	"github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
@@ -10,23 +11,23 @@ import (
 	"github.com/itp-backend/backend-b-antar-jemput/utils"
 )
 
-type AgentController interface {
-	RegisterAgent(c *fiber.Ctx) error
+type TransactionController interface {
+	CreateTransaction(c *fiber.Ctx) error
 }
 
-type agentController struct {
-	AgentService service.AgentService
+type transactionController struct {
+	TransactionService service.TransactionService
 }
 
-func NewAgentController(s service.AgentService) AgentController {
-	return agentController{
-		AgentService: s,
+func NewTransacrtionController(s service.TransactionService) TransactionController {
+	return transactionController{
+		TransactionService: s,
 	}
 }
 
-func (as agentController) RegisterAgent(c *fiber.Ctx) error {
-	var agent web.RegisterAgentRequest
-	if err := c.BodyParser(&agent); err != nil {
+func (ts transactionController) CreateTransaction(c *fiber.Ctx) error {
+	var transaction web.CreateTransactionRequest
+	if err := c.BodyParser(&transaction); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code":    fiber.StatusBadRequest,
 			"message": "Error for handling your request",
@@ -34,7 +35,7 @@ func (as agentController) RegisterAgent(c *fiber.Ctx) error {
 		})
 	}
 
-	err := as.AgentService.RegisterAgent(agent)
+	err := ts.TransactionService.CreateTransaction(transaction)
 	if err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &validator.ValidationErrors{}) {
@@ -51,12 +52,12 @@ func (as agentController) RegisterAgent(c *fiber.Ctx) error {
 			})
 		}
 	}
+	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
+		"code":    fiber.StatusAccepted,
+		"message": " Transaksi Diterima ",
+		"data":    fiber.Map{
+            "transactionId":
+        },
 
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"code":    fiber.StatusCreated,
-		"message": " Sukses Membuat Akun",
-		"data": fiber.Map{
-			"token": agent.Username,
-		},
 	})
 }
