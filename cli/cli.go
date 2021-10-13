@@ -58,22 +58,21 @@ func (cli *Cli) Run(application *app.Application) {
 	transactionController := controller.NewTransacrtionController(transactionService)
 
 	// Route
-	middleware.LoggerRoute(appFiber)
-	appFiber.Post("/customer", customerController.RegisterCustomer)
-	appFiber.Post("/agent", agentController.RegisterAgent)
-	appFiber.Get("/location/provinces", locationController.GetAllProvinces)
+    middleware.LoggerRoute(appFiber)
+    middleware.AllowCrossOrigin(appFiber)
+    appFiber.Post("/login", loginController.Login)
+    appFiber.Post("/customer", customerController.RegisterCustomer)
+    appFiber.Post("/agent", agentController.RegisterAgent)
+    // Set Middleware Auth with JWT Config
+    middleware.MiddlewareAuth(appFiber)
+    appFiber.Get("/location/provinces", locationController.GetAllProvinces)
 	appFiber.Get("/location", locationController.GetAllRegenciesByProvinceId)
-	appFiber.Get("/location/regencies", locationController.GetAllRegencies)
+  appFiber.Get("/location/regencies", locationController.GetAllRegencies)
 	appFiber.Get("/location/districts", locationController.GetAllDistrictsByRegencyId)
-	appFiber.Post("/login", loginController.Login)
-	appFiber.Post("/transaction", transactionController.CreateTransaction)
+  	appFiber.Post("/transaction", transactionController.CreateTransaction)
 
-	route.NotFoundRoute(appFiber)
-
-	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
-	route.NotFoundRoute(appFiber)
-	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
-
+    route.NotFoundRoute(appFiber)
+    StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 }
 
 func StartServerWithGracefulShutdown(app *fiber.App, port string) {

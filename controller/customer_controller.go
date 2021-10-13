@@ -33,7 +33,7 @@ func (cs customerController) RegisterCustomer(c *fiber.Ctx) error {
 	if err := c.BodyParser(&customer); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code":    fiber.StatusBadRequest,
-			"message": "Error for handling your request",
+			"message": err.Error(),
 			"data":    nil,
 		})
 	}

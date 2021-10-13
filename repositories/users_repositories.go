@@ -11,7 +11,7 @@ import (
 
 type UserRepository interface {
 	Save(user database.User) (database.User, error)
-	CheckUsernameAndPassword(username string, password string, roleId uint) (database.User, error)
+	CheckUsernameAndPassword(username string, roleId uint) (database.User, error)
 	WithTrx(trxHandle *gorm.DB) userRepository
 }
 
@@ -32,9 +32,9 @@ func (u userRepository) Save(user database.User) (database.User, error) {
 	return user, err
 }
 
-func (u userRepository) CheckUsernameAndPassword(username string, password string, roleId uint) (database.User, error) {
+func (u userRepository) CheckUsernameAndPassword(username string, roleId uint) (database.User, error) {
 	var user database.User
-	err := u.DB.Debug().Where("username = ? and password = ? and role_id = ?", username, password, roleId).Preload("Role").First(&user).Error
+	err := u.DB.Debug().Where("username = ? AND role_id = ?", username, roleId).Preload("Role").First(&user).Error
 	if user.Id == 0 {
 		return user, errors.New("No matched user in the database")
 	}
