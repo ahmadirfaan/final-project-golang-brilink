@@ -1,15 +1,15 @@
 package databaseconn
 
 import (
-    "fmt"
-    "log"
-    "time"
+	"fmt"
+	"log"
+	"time"
 
-    "github.com/itp-backend/backend-b-antar-jemput/app"
-    "github.com/itp-backend/backend-b-antar-jemput/models/database"
-    "gorm.io/driver/mysql"
-    "gorm.io/gorm"
-    "gorm.io/gorm/logger"
+	"github.com/itp-backend/backend-b-antar-jemput/app"
+	"github.com/itp-backend/backend-b-antar-jemput/models/database"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func InitDb() *gorm.DB {
@@ -47,17 +47,18 @@ func InitDb() *gorm.DB {
 func InitCreateTable(db *gorm.DB) {
 
 	db.Debug().AutoMigrate(
-        &database.Role{},
-        &database.Agent{},
-        &database.Customer{},
+		&database.Role{},
+		&database.Agent{},
+		&database.Customer{},
 		&database.User{},
-        &database.ServiceTypeTransaction{},
-        &database.TransactionType{},
-        &database.Transactions{},
-    )
-    /**
-    Untuk menjalankan pertama kali supaya tersimpan data role dan admin
-     */
+		&database.ServiceTypeTransaction{},
+		&database.TransactionType{},
+		&database.Transactions{},
+	)
+
+	/**
+	  Untuk menjalankan pertama kali supaya tersimpan data role dan admin
+	*/
 	//roleRepo := repositories.NewRoleRepository(db)
 	//roleAdmin := database.Role{
 	//	Role: "Admin",
