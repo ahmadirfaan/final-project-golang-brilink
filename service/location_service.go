@@ -8,7 +8,6 @@ import (
 type LocationService interface {
 	GetAllLocationProvince() ([]database.Provinces, error)
 	GetAllRegencyByProvince(provinceId string) ([]database.Regencies, error)
-	GetAllLocationRegency() ([]database.Regencies, error)
 	GetAllDistrictByRegency(regencyId string) ([]database.Districts, error)
 }
 
@@ -36,10 +35,6 @@ func (l *locationService) GetAllRegencyByProvince(provinceId string) ([]database
 	return regencies, err
 }
 
-func (l *locationService) GetAllLocationRegency() ([]database.Regencies, error) {
-	regencies, err := l.RegencyRepository.GetAll()
-	return regencies, err
-}
 
 func (l *locationService) GetAllDistrictByRegency(regencyId string) ([]database.Districts, error) {
 	districts, err := l.DistrictRepository.FindByRegencyId(regencyId)

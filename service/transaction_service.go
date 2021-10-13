@@ -50,5 +50,5 @@ func (t *transactionService) CreateTransaction(request web.CreateTransactionRequ
 		tx.Debug().Rollback()
 		return err
 	}
-	return tx.Commit().Error, transaction
+	return tx.Commit().Error
 }

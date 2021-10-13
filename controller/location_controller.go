@@ -8,7 +8,6 @@ import (
 type LocationController interface {
 	GetAllProvinces(c *fiber.Ctx) error
 	GetAllRegenciesByProvinceId(c *fiber.Ctx) error
-	GetAllRegencies(c *fiber.Ctx) error
 	GetAllDistrictsByRegencyId(c *fiber.Ctx) error
 }
 
@@ -65,22 +64,6 @@ func (lc locationController) GetAllRegenciesByProvinceId(c *fiber.Ctx) error {
 	})
 }
 
-func (lc locationController) GetAllRegencies(c *fiber.Ctx) error {
-	regencies, err := lc.LocationService.GetAllLocationRegency()
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code":    fiber.StatusBadRequest,
-			"message": err.Error(),
-			"data":    nil,
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"code":    fiber.StatusOK,
-		"message": nil,
-		"data":    regencies,
-	})
-}
 
 func (lc locationController) GetAllDistrictsByRegencyId(c *fiber.Ctx) error {
 	regencyId := c.Query("regencyId")

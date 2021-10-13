@@ -9,7 +9,7 @@ type Transactions struct {
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 	DeletedAt         gorm.DeletedAt  `gorm:"index"`
-	Id                uint            `gorm:"autoIncrement;primary key"`
+	Id                uint            `gorm:"autoIncrement;primary key" json:"-"`
 	TransactionTypeId uint            `gorm:"not null"`
 	TransactionType   TransactionType `gorm:"foreignkey:TransactionTypeId;references:Id";`
 	CustomerId        uint            `gorm:"not null"`

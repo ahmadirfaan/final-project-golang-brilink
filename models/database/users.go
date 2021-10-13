@@ -10,7 +10,7 @@ type User struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	DeletedAt  gorm.DeletedAt `gorm:"index"`
-	Id         uint           `gorm:"autoIncrement;primary key"`
+	Id         uint           `gorm:"autoIncrement;primary key" json:"-"`
 	Username   string         `gorm:"uniqueIndex;type:varchar(255);not null"`
 	Password   string         `gorm:"type:varchar(255);not null"`
 	RoleId     uint

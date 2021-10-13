@@ -1,7 +1,8 @@
 package repositories
 
 import (
-	"fmt"
+    "errors"
+    "fmt"
 	"log"
 
 	"github.com/itp-backend/backend-b-antar-jemput/models/database"
@@ -10,6 +11,7 @@ import (
 
 type DistrictRepository interface {
 	FindByRegencyId(regencyId string) ([]database.Districts, error)
+    FindById(districtId string) (database.Districts, error)
 }
 
 type districtRepository struct {
@@ -22,11 +24,21 @@ func NewDistrictRepository(db *gorm.DB) DistrictRepository {
 	}
 }
 
-func (u districtRepository) FindByRegencyId(regencyId string) ([]database.Districts, error) {
-	log.Println("Ini Error sebelum di save")
-	var district []database.Districts
-	err := u.DB.Debug().Where("regency_id = ?", regencyId).Find(&district).Error
+func (d districtRepository) FindByRegencyId(regencyId string) ([]database.Districts, error) {
+	var districs []database.Districts
+	err := d.DB.Debug().Where("regency_id = ?", regencyId).Find(&districs).Error
 	fmt.Println(err)
-	log.Printf("District Repositories:%+v\n", district)
-	return district, err
+	log.Printf("District Repositories:%+v\n", districs)
+	return districs, err
+}
+
+func (d districtRepository) FindById(districtId string) (database.Districts, error) {
+    var district database.Districts
+    err := d.DB.Debug().First(&district, districtId).Error
+    log.Println("District Id : ", district.Id)
+    if district.Id != nil {
+        return district, err
+    } else {
+        return district, errors.New("No found record districtId")
+    }
 }

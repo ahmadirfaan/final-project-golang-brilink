@@ -55,9 +55,6 @@ func (ts transactionController) CreateTransaction(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
 		"code":    fiber.StatusAccepted,
 		"message": " Transaksi Diterima ",
-		"data":    fiber.Map{
-            "transactionId":
-        },
-
+		"data":    nil,
 	})
 }

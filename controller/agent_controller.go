@@ -50,7 +50,13 @@ func (as agentController) RegisterAgent(c *fiber.Ctx) error {
 				"message": "Username Already is exist",
 				"data":    nil,
 			})
-		}
+		} else {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code": fiber.StatusBadRequest,
+                "message": err.Error(),
+                "data": nil,
+            })
+        }
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{

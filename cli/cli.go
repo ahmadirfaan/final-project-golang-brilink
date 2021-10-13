@@ -47,7 +47,7 @@ func (cli *Cli) Run(application *app.Application) {
 	customerService := service.NewCustomerService(customerRepo, userRepo, db)
 	locationService := service.NewLocationService(provinceRepo, regencyRepo, districtRepo)
 	loginService := service.NewLoginService(userRepo)
-	agentService := service.NewAgentService(agentRepo, userRepo, db)
+	agentService := service.NewAgentService(agentRepo, userRepo, districtRepo, db)
 	transactionService := service.NewTransacrtionService(transactionRepo, db)
 
 	// Controller
@@ -58,21 +58,20 @@ func (cli *Cli) Run(application *app.Application) {
 	transactionController := controller.NewTransacrtionController(transactionService)
 
 	// Route
-    middleware.LoggerRoute(appFiber)
-    middleware.AllowCrossOrigin(appFiber)
-    appFiber.Post("/login", loginController.Login)
-    appFiber.Post("/customer", customerController.RegisterCustomer)
-    appFiber.Post("/agent", agentController.RegisterAgent)
-    // Set Middleware Auth with JWT Config
-    middleware.MiddlewareAuth(appFiber)
-    appFiber.Get("/location/provinces", locationController.GetAllProvinces)
+	middleware.LoggerRoute(appFiber)
+	middleware.AllowCrossOrigin(appFiber)
+	appFiber.Post("/login", loginController.Login)
+	appFiber.Post("/customer", customerController.RegisterCustomer)
+	appFiber.Post("/agent", agentController.RegisterAgent)
+	// Set Middleware Auth with JWT Config
+	middleware.MiddlewareAuth(appFiber)
+	appFiber.Get("/location/provinces", locationController.GetAllProvinces)
 	appFiber.Get("/location", locationController.GetAllRegenciesByProvinceId)
-  appFiber.Get("/location/regencies", locationController.GetAllRegencies)
 	appFiber.Get("/location/districts", locationController.GetAllDistrictsByRegencyId)
-  	appFiber.Post("/transaction", transactionController.CreateTransaction)
+	appFiber.Post("/transaction", transactionController.CreateTransaction)
 
-    route.NotFoundRoute(appFiber)
-    StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
+	route.NotFoundRoute(appFiber)
+	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 }
 
 func StartServerWithGracefulShutdown(app *fiber.App, port string) {
