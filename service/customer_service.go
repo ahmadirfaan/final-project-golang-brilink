@@ -1,12 +1,12 @@
 package service
 
 import (
-    "fmt"
-    "github.com/itp-backend/backend-b-antar-jemput/models/database"
-    "github.com/itp-backend/backend-b-antar-jemput/models/web"
-    "github.com/itp-backend/backend-b-antar-jemput/repositories"
-    "github.com/itp-backend/backend-b-antar-jemput/utils"
-    "gorm.io/gorm"
+	"fmt"
+	"github.com/itp-backend/backend-b-antar-jemput/models/database"
+	"github.com/itp-backend/backend-b-antar-jemput/models/web"
+	"github.com/itp-backend/backend-b-antar-jemput/repositories"
+	"github.com/itp-backend/backend-b-antar-jemput/utils"
+	"gorm.io/gorm"
 )
 
 type CustomerService interface {
@@ -27,6 +27,7 @@ func NewCustomerService(cr repositories.CustomerRepository, ur repositories.User
 	}
 }
 
+// RegisterCustomer function service for handling register customer
 func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) error {
 	err := utils.NewValidator().Struct(&request)
 	if err != nil {
@@ -60,7 +61,7 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 		RoleId:     2,
 		CustomerId: &customer.Id,
 		Username:   request.Username,
-		Password:   request.Password,
+		Password:   utils.HashPassword(request.Password),
 	}
 	//log.Printf("Ini CustomerId sebelum di save: %d, roleId: %d", user.CustomerId, user.RoleId)
 	user, err = c.userRepository.WithTrx(tx).Save(user)

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/itp-backend/backend-b-antar-jemput/models/database"
-	web "github.com/itp-backend/backend-b-antar-jemput/models/web/agent"
+	"github.com/itp-backend/backend-b-antar-jemput/models/web"
 	"github.com/itp-backend/backend-b-antar-jemput/repositories"
 	"github.com/itp-backend/backend-b-antar-jemput/utils"
 	"gorm.io/gorm"
@@ -57,7 +57,7 @@ func (a *agentService) RegisterAgent(request web.RegisterAgentRequest) error {
 		RoleId:   1,
 		AgentId:  &agent.Id,
 		Username: request.Username,
-		Password: request.Password,
+		Password: utils.HashPassword(request.Password),
 	}
 	user, err = a.userRepository.WithTrx(tx).Save(user)
 	if err != nil {

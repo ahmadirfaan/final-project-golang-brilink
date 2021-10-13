@@ -1,7 +1,11 @@
 package controller
 
 import (
+    "errors"
+    "github.com/go-playground/validator"
+    "github.com/go-sql-driver/mysql"
     "github.com/itp-backend/backend-b-antar-jemput/models/web"
+    "github.com/itp-backend/backend-b-antar-jemput/utils"
     "log"
 
     "github.com/gofiber/fiber/v2"
@@ -35,13 +39,22 @@ func (cs customerController) RegisterCustomer(c *fiber.Ctx) error {
 	}
 
 	err := cs.CustomerService.RegisterCustomer(customer)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"code":    fiber.StatusBadRequest,
-			"message": err.Error(),
-			"data":    nil,
-		})
-	}
+    if err != nil {
+        var mysqlErr *mysql.MySQLError
+        if errors.As(err, &validator.ValidationErrors{}) {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code":    fiber.StatusBadRequest,
+                "message": utils.ValidatorErrors(err),
+                "data":    nil,
+            })
+        } else if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+            return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+                "code":    fiber.StatusConflict,
+                "message": "Username Already is exist",
+                "data":    nil,
+            })
+        }
+    }
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"code":    fiber.StatusCreated,

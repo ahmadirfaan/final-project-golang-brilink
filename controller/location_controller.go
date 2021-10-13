@@ -1,13 +1,15 @@
 package controller
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/itp-backend/backend-b-antar-jemput/service"
+    "github.com/gofiber/fiber/v2"
+    "github.com/itp-backend/backend-b-antar-jemput/service"
 )
 
 type LocationController interface {
 	GetAllProvinces(c *fiber.Ctx) error
-    GetAllRegenciesByProvinceId(c *fiber.Ctx) error
+	GetAllRegenciesByProvinceId(c *fiber.Ctx) error
+	GetAllRegencies(c *fiber.Ctx) error
+	GetAllDistrictsByRegencyId(c *fiber.Ctx) error
 }
 
 type locationController struct {
@@ -21,7 +23,50 @@ func NewLocationController(service service.LocationService) LocationController {
 }
 
 func (lc locationController) GetAllProvinces(c *fiber.Ctx) error {
-	provinces, err := lc.LocationService.GetAllLocationProvince()
+    authToken := c.Get("Authorization: Bearer", "Gak ada token")
+    provinces, err := lc.LocationService.GetAllLocationProvince()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    fiber.StatusBadRequest,
+			"message": err.Error(),
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"code":    fiber.StatusOK,
+		"message": authToken,
+		"data":    provinces,
+	})
+}
+
+func (lc locationController) GetAllRegenciesByProvinceId(c *fiber.Ctx) error {
+	provinceId := c.Query("provinceId")
+	if provinceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    fiber.StatusBadRequest,
+			"message": "Please Input the correct of Province Id",
+			"data":    nil,
+		})
+	}
+	regencies, err := lc.LocationService.GetAllRegencyByProvince(provinceId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"code":    fiber.StatusInternalServerError,
+			"message": "There is errors in server",
+			"data":    nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"code":    fiber.StatusOK,
+		"message": nil,
+		"data":    regencies,
+	})
+}
+
+func (lc locationController) GetAllRegencies(c *fiber.Ctx) error {
+	regencies, err := lc.LocationService.GetAllLocationRegency()
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"code":    fiber.StatusBadRequest,
@@ -33,31 +78,30 @@ func (lc locationController) GetAllProvinces(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"code":    fiber.StatusOK,
 		"message": nil,
-		"data":    provinces,
+		"data":    regencies,
 	})
 }
 
-func (lc locationController) GetAllRegenciesByProvinceId(c *fiber.Ctx) error {
-    provinceId := c.Query("provinceId")
-    if provinceId == "" {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-            "code":    fiber.StatusBadRequest,
-            "message": "Please Input the correct of Province Id",
-            "data":    nil,
-        })
-    }
-    regencies, err := lc.LocationService.GetAllRegencyByProvince(provinceId)
-    if err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-            "code":    fiber.StatusBadRequest,
-            "message": err.Error(),
-            "data":    nil,
-        })
-    }
-
-    return c.Status(fiber.StatusOK).JSON(fiber.Map{
-        "code":    fiber.StatusOK,
-        "message": nil,
-        "data":    regencies,
-    })
+func (lc locationController) GetAllDistrictsByRegencyId(c *fiber.Ctx) error {
+	regencyId := c.Query("regencyId")
+	if regencyId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    fiber.StatusBadRequest,
+			"message": "Please Input the correct of Regency Id",
+			"data":    nil,
+		})
+	}
+	districts, err := lc.LocationService.GetAllDistrictByRegency(regencyId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"code":    fiber.StatusInternalServerError,
+			"message": "There is errors in server",
+			"data":    nil,
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"code":    fiber.StatusOK,
+		"message": nil,
+		"data":    districts,
+	})
 }

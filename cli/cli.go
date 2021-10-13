@@ -1,19 +1,21 @@
 package cli
 
 import (
-    "fmt"
-    route "github.com/itp-backend/backend-b-antar-jemput/routes"
-    "os"
-    "os/signal"
+	"fmt"
+	"os"
+	"os/signal"
 
-    "github.com/gofiber/fiber/v2"
-    "github.com/itp-backend/backend-b-antar-jemput/app"
-    "github.com/itp-backend/backend-b-antar-jemput/config"
-    databaseconn "github.com/itp-backend/backend-b-antar-jemput/config/database"
-    "github.com/itp-backend/backend-b-antar-jemput/controller"
-    "github.com/itp-backend/backend-b-antar-jemput/repositories"
-    "github.com/itp-backend/backend-b-antar-jemput/service"
-    log "github.com/sirupsen/logrus"
+	"github.com/itp-backend/backend-b-antar-jemput/middleware"
+	route "github.com/itp-backend/backend-b-antar-jemput/routes"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/itp-backend/backend-b-antar-jemput/app"
+	"github.com/itp-backend/backend-b-antar-jemput/config"
+	databaseconn "github.com/itp-backend/backend-b-antar-jemput/config/database"
+	"github.com/itp-backend/backend-b-antar-jemput/controller"
+	"github.com/itp-backend/backend-b-antar-jemput/repositories"
+	"github.com/itp-backend/backend-b-antar-jemput/service"
+	log "github.com/sirupsen/logrus"
 )
 
 type Cli struct {
@@ -32,39 +34,45 @@ func (cli *Cli) Run(application *app.Application) {
 
 	// set up connection
 	db := databaseconn.InitDb()
-    //Repository
+	//Repository
 	userRepo := repositories.NewUserRepository(db)
 	customerRepo := repositories.NewCustomerRepository(db)
-  provinceRepo := repositories.NewProvinceRepository(db)
-  regencyRepo := repositories.NewRegencyRepository(db)
-  agentRepo := repositories.NewAgentRepository(db)
+	provinceRepo := repositories.NewProvinceRepository(db)
+	regencyRepo := repositories.NewRegencyRepository(db)
+	agentRepo := repositories.NewAgentRepository(db)
+	districtRepo := repositories.NewDistrictRepository(db)
+	transactionRepo := repositories.NewTransactionRepository(db)
 
-  // Service
+	// Service
 	customerService := service.NewCustomerService(customerRepo, userRepo, db)
-  locationService := service.NewLocationService(provinceRepo, regencyRepo)
-  loginService := service.NewLoginService(userRepo)
-  agentService := service.NewAgentService(agentRepo, userRepo, db)
+	locationService := service.NewLocationService(provinceRepo, regencyRepo, districtRepo)
+	loginService := service.NewLoginService(userRepo)
+	agentService := service.NewAgentService(agentRepo, userRepo, db)
+	transactionService := service.NewTransacrtionService(transactionRepo, db)
 
-  // Controller
-  customerController := controller.NewCustomerController(customerService)
-  locationController := controller.NewLocationController(locationService)
-  loginController := controller.NewLoginController(loginService)
-  agentController := controller.NewAgentController(agentService)
-  
-  // Route
-  route.LoggerRoute(appFiber)
-  appFiber.Post("/customer", customerController.RegisterCustomer)
-  app.Post("/agent", agentController.RegisterAgent)
-	appFiber.Get("/location/provinces", locationController.GetAllProvinces)
+	// Controller
+	customerController := controller.NewCustomerController(customerService)
+	locationController := controller.NewLocationController(locationService)
+	loginController := controller.NewLoginController(loginService)
+	agentController := controller.NewAgentController(agentService)
+	transactionController := controller.NewTransacrtionController(transactionService)
+
+	// Route
+    middleware.LoggerRoute(appFiber)
+    middleware.AllowCrossOrigin(appFiber)
+    appFiber.Post("/login", loginController.Login)
+    appFiber.Post("/customer", customerController.RegisterCustomer)
+    appFiber.Post("/agent", agentController.RegisterAgent)
+    // Set Middleware Auth with JWT Config
+    middleware.MiddlewareAuth(appFiber)
+    appFiber.Get("/location/provinces", locationController.GetAllProvinces)
 	appFiber.Get("/location", locationController.GetAllRegenciesByProvinceId)
-  appFiber.Post("/login", loginController.Login)
-  route.NotFoundRoute(appFiber)
-  
-  StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
-	route.NotFoundRoute(app)
-	log.Println(app.Server())
-	StartServerWithGracefulShutdown(app, application.Config.AppPort)
+  appFiber.Get("/location/regencies", locationController.GetAllRegencies)
+	appFiber.Get("/location/districts", locationController.GetAllDistrictsByRegencyId)
+  	appFiber.Post("/transaction", transactionController.CreateTransaction)
 
+    route.NotFoundRoute(appFiber)
+    StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 }
 
 func StartServerWithGracefulShutdown(app *fiber.App, port string) {
