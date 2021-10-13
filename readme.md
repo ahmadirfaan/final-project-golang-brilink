@@ -6,8 +6,8 @@
  - [x] Get All Regency By Province ID 
 
 **List pengerjaan pada R2:**
- - [ ] Implementation JWT 
- - [ ] Get All Distrct By Regency ID
+ - [x] Implementation JWT 
+ - [ ] Get All District By Regency ID
  - [ ] Create Transactions
  - [ ] Find Transactions By IdCustomer
  - [ ] Find Transactions By IdAgent 

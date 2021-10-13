@@ -54,6 +54,7 @@ func (cli *Cli) Run(application *app.Application) {
 
 	// Route
     middleware.LoggerRoute(appFiber)
+    middleware.AllowCrossOrigin(appFiber)
     appFiber.Post("/login", loginController.Login)
     appFiber.Post("/customer", customerController.RegisterCustomer)
     appFiber.Post("/agent", agentController.RegisterAgent)

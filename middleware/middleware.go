@@ -2,6 +2,7 @@ package middleware
 
 import (
     "github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2/middleware/cors"
     "github.com/gofiber/fiber/v2/middleware/logger"
     jwtware "github.com/gofiber/jwt/v3"
     application "github.com/itp-backend/backend-b-antar-jemput/app"
@@ -28,5 +29,11 @@ func MiddlewareAuth(app *fiber.App) {
             })
             return nil
         },
+    }))
+}
+
+func AllowCrossOrigin(app *fiber.App) {
+    app.Use(cors.New(cors.Config{
+        AllowOrigins: "*",
     }))
 }
