@@ -19,7 +19,7 @@ type transactionController struct {
 	TransactionService service.TransactionService
 }
 
-func NewTransacrtionController(s service.TransactionService) TransactionController {
+func NewTransactionController(s service.TransactionService) TransactionController {
 	return transactionController{
 		TransactionService: s,
 	}
@@ -50,7 +50,13 @@ func (ts transactionController) CreateTransaction(c *fiber.Ctx) error {
 				"message": "Username Already is exist",
 				"data":    nil,
 			})
-		}
+		} else {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code": fiber.StatusBadRequest,
+                "message": err.Error(),
+                "data": nil,
+            })
+        }
 	}
 	return c.Status(fiber.StatusAccepted).JSON(fiber.Map{
 		"code":    fiber.StatusAccepted,

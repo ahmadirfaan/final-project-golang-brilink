@@ -11,6 +11,6 @@ type Customer struct {
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
 	Id          uint           `gorm:"autoIncrement;primary key" json:"-"`
-	Name        string         `gorm:"varchar(255); not null"`
+	Name        string         `gorm:"varchar(255);not null"`
 	NoHandphone string         `gorm:"varchar(12);not null"`
 }

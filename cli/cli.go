@@ -42,20 +42,22 @@ func (cli *Cli) Run(application *app.Application) {
 	agentRepo := repositories.NewAgentRepository(db)
 	districtRepo := repositories.NewDistrictRepository(db)
 	transactionRepo := repositories.NewTransactionRepository(db)
+    transactionTypeRepo := repositories.NewTransactionTypeRepository(db)
 
 	// Service
 	customerService := service.NewCustomerService(customerRepo, userRepo, db)
 	locationService := service.NewLocationService(provinceRepo, regencyRepo, districtRepo)
 	loginService := service.NewLoginService(userRepo)
 	agentService := service.NewAgentService(agentRepo, userRepo, districtRepo, db)
-	transactionService := service.NewTransacrtionService(transactionRepo, db)
+	transactionService := service.NewTransactionService(
+        transactionRepo, transactionTypeRepo, districtRepo, db)
 
 	// Controller
 	customerController := controller.NewCustomerController(customerService)
 	locationController := controller.NewLocationController(locationService)
 	loginController := controller.NewLoginController(loginService)
 	agentController := controller.NewAgentController(agentService)
-	transactionController := controller.NewTransacrtionController(transactionService)
+	transactionController := controller.NewTransactionController(transactionService)
 
 	// Route
 	middleware.LoggerRoute(appFiber)
