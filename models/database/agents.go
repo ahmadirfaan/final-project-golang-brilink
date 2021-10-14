@@ -7,8 +7,8 @@ import (
 )
 
 type Agent struct {
-	CreatedAt   time.Time `json:"-"`
-	UpdatedAt   time.Time `json:"-"`
+	CreatedAt   time.Time      `json:"-"`
+	UpdatedAt   time.Time      `json:"-"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 	Id          uint           `gorm:"autoIncrement;primary key" json:"-"`
 	AgentName   string         `gorm:"type:varchar(250);not null"`
