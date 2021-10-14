@@ -22,7 +22,6 @@ func NewLocationController(service service.LocationService) LocationController {
 }
 
 func (lc locationController) GetAllProvinces(c *fiber.Ctx) error {
-    authToken := c.Get("Authorization: Bearer", "Gak ada token")
     provinces, err := lc.LocationService.GetAllLocationProvince()
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -34,7 +33,7 @@ func (lc locationController) GetAllProvinces(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"code":    fiber.StatusOK,
-		"message": authToken,
+		"message": nil,
 		"data":    provinces,
 	})
 }

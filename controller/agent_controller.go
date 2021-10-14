@@ -62,8 +62,6 @@ func (as agentController) RegisterAgent(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"code":    fiber.StatusCreated,
 		"message": " Sukses Membuat Akun",
-		"data": fiber.Map{
-			"token": agent.Username,
-		},
+		"data": nil,
 	})
 }

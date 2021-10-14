@@ -9,5 +9,11 @@
  - [x] Implementation JWT
  - [x] Get All District By Regency ID
  - [x] Create Transactions
- - [ ] Find Transactions By IdCustomer
- - [ ] Find Transactions By IdAgent
+ - [x] Find Transactions By IdCustomer
+ - [x] Find Transactions By IdAgent
+
+**List pengerjaan pada R3:**
+- [ ] Transaction Confirmed
+- [ ] Transaction Canceled
+- [ ] Transaction Done + Give Rating
+- [ ] Find Agent

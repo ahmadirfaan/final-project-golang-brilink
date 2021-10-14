@@ -7,12 +7,12 @@ import (
 )
 
 type User struct {
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	DeletedAt  gorm.DeletedAt `gorm:"index"`
-	Id         uint           `gorm:"autoIncrement;primary key" json:"-"`
-	Username   string        `gorm:"uniqueIndex;type:varchar(255);not null"`
-	Password   string        `gorm:"type:varchar(255);not null"`
+	CreatedAt  time.Time      `json:"-"`
+	UpdatedAt  time.Time      `json:"-"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
+	Id         *uint          `gorm:"autoIncrement;primary key" json:"-"`
+	Username   string         `gorm:"uniqueIndex;type:varchar(255);not null"`
+	Password   string         `gorm:"type:varchar(255);not null"`
 	RoleId     uint
 	Role       Role `gorm:"foreignkey:RoleId;references:Id"`
 	CustomerId *uint
