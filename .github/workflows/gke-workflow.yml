@@ -15,11 +15,14 @@ env:
     GKE_CLUSTER: backend-gke-cluster
     GKE_REGION: asia-east1
     TEAM_NAME: ${{ secrets.TEAM_NAME }}
-#    MINIO_ENDPOINT: storage.googleapis.com
-#    MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-#    MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-#    MINIO_REGION: US-EAST1
-#    MINIO_BUCKET: ${{ secrets.TEAM_NAME }}-rakamin
+    MINIO_ENDPOINT: storage.googleapis.com
+    MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+    MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+    MINIO_REGION: US-EAST1
+    MINIO_BUCKET: ${{ secrets.TEAM_NAME }}-rakamin
+    DB_MAX_CONNECTIONS: 100
+    DB_MAX_IDLE_CONNECTIONS: 10
+    DB_MAX_LIFETIME_CONNECTIONS: 2
 
 jobs:
     setup-build-publish-deploy:
