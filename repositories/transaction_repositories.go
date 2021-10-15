@@ -32,7 +32,9 @@ func (t transactionRepo) Save(transactions database.Transactions) (database.Tran
 func (t transactionRepo) FindTransactionWithUserId(userId string) ([]database.Transactions, error) {
 	var transactionList []database.Transactions
 	err := t.DB.Debug().Where("agent_id = ? or customer_id = ?", userId, userId).
-		Preload("TransactionType").Preload("TransactionType.ServiceTypeTransaction").Find(&transactionList).Error
+        Preload("UserCustomer").Preload("UserCustomer.Customer").
+        Preload("TransactionType").Preload("TransactionType.ServiceTypeTransaction").
+        Preload("UserAgent").Preload("UserAgent.Agent").Find(&transactionList).Error
 	return transactionList, err
 }
 

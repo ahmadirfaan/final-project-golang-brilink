@@ -51,8 +51,8 @@ func (ts transactionController) GetAllTransactionByUserId(c *fiber.Ctx) error {
     } else {
       return c.Status(fiber.StatusOK).JSON(fiber.Map{
           "code":    fiber.StatusOK,
-          "message": transactions,
-          "data":    nil,
+          "message": nil,
+          "data":    transactions,
       })
     }
 }
@@ -66,8 +66,23 @@ func (ts transactionController) CreateTransaction(c *fiber.Ctx) error {
 			"data":    nil,
 		})
 	}
-
-	err := ts.TransactionService.CreateTransaction(transaction)
+    userId, err := utils.ExtractToken(c)
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "code":    fiber.StatusInternalServerError,
+            "message": "Internal Server Error",
+            "data":    nil,
+        })
+    }
+    isAgent, err := ts.TransactionService.IsUserAgent(userId)
+    if *isAgent {
+        return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+            "code": fiber.StatusForbidden,
+            "message": "You're not appropriate to do create transactions",
+            "data": nil,
+        })
+    }
+	err = ts.TransactionService.CreateTransaction(transaction, userId)
 	if err != nil {
 		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &validator.ValidationErrors{}) {

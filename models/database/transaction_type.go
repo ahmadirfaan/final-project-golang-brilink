@@ -12,5 +12,5 @@ type TransactionType struct {
 	Id                       *uint                  `gorm:"autoIncrement;primary key" json:"-"`
 	ServiceTypeTransactionId uint                   `json:"-"`
 	ServiceTypeTransaction   ServiceTypeTransaction `gorm:"foreignkey:ServiceTypeTransactionId;references:Id" json:"serviceTypeTransaction"`
-	NameTypeTransaction      string                 `gorm:"varchar(255);not null" json:"nameTansactionType"`
+	NameTypeTransaction      string                 `gorm:"varchar(255);not null" json:"nameTransactionType"`
 }

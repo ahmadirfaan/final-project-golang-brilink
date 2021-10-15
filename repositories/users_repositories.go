@@ -12,7 +12,7 @@ import (
 type UserRepository interface {
 	Save(user database.User) (database.User, error)
 	CheckUsernameAndPassword(username string, roleId uint) (database.User, error)
-    IsUserAgent(userId uint) (bool, error)
+    IsUserAgent(userId uint) (*bool, error)
     IsExist(userId uint) (bool, error)
 	WithTrx(trxHandle *gorm.DB) userRepository
 }
@@ -44,13 +44,15 @@ func (u userRepository) CheckUsernameAndPassword(username string, roleId uint) (
 	return user, err
 }
 
-func (u userRepository) IsUserAgent(userId uint) (bool, error) {
+func (u userRepository) IsUserAgent(userId uint) (*bool, error) {
     var user database.User
     err := u.DB.Debug().Where("id = ? AND role_id = ?", userId, 1).Preload("Role").First(&user).Error
+    isAgent := true
+    isCustomer := false
     if user.Role.Id == 1 {
-        return true, err
+        return &isAgent, err
     } else {
-        return false, err
+        return &isCustomer, err
     }
 }
 
