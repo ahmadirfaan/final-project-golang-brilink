@@ -24,7 +24,6 @@ env:
     DB_MAX_IDLE_CONNECTIONS: 10
     DB_MAX_LIFETIME_CONNECTIONS: 2
     SERVER_READ_TIMEOUT: 60
-    APP_PORT: 8080
 jobs:
     setup-build-publish-deploy:
         name: Setup, Build, Publish, and Deploy
