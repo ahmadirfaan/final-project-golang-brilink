@@ -11,6 +11,7 @@ import (
 
 type LoginController interface {
     Login(c *fiber.Ctx) error
+    WelcomingAPI(c *fiber.Ctx) error
 }
 
 type loginController struct {
@@ -65,5 +66,13 @@ func (cs loginController) Login(c *fiber.Ctx) error {
         "data": fiber.Map{
             "accessToken": token,
         },
+    })
+}
+
+func (cs loginController) WelcomingAPI(c *fiber.Ctx) error {
+    return c.Status(fiber.StatusOK).JSON(fiber.Map{
+        "code": fiber.StatusOK,
+        "message": "Welcome to API BRILINK-Antar-Jemput-B",
+        "data": nil,
     })
 }

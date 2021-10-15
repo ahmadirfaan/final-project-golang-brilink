@@ -65,6 +65,7 @@ func (cli *Cli) Run(application *app.Application) {
 	appFiber.Post("/login", loginController.Login)
 	appFiber.Post("/customers", customerController.RegisterCustomer)
 	appFiber.Post("/agents", agentController.RegisterAgent)
+    appFiber.Get("/", loginController.WelcomingAPI)
 	// Set Middleware Auth with JWT Config
 	middleware.MiddlewareAuth(appFiber)
 	appFiber.Get("/locations/provinces", locationController.GetAllProvinces)
