@@ -16,7 +16,7 @@ type User struct {
 	RoleId     uint           `json:"-"`
 	Role       Role           `gorm:"foreignkey:RoleId;references:Id" json:"-"`
 	CustomerId *uint          `json:"-"`
-	Customer   *Customer       `gorm:"foreignkey:CustomerId;references:Id" json:"customer,omitempty"`
+	Customer   *Customer      `gorm:"foreignkey:CustomerId;references:Id" json:"customer,omitempty"`
 	AgentId    *uint          `json:"-"`
-	Agent      *Agent          `gorm:"foreignkey:AgentId;references:Id" json:"agent,omitempty"`
+	Agent      *Agent         `gorm:"foreignkey:AgentId;references:Id" json:"agent,omitempty"`
 }

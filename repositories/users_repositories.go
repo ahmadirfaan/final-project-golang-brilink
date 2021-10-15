@@ -14,6 +14,7 @@ type UserRepository interface {
 	CheckUsernameAndPassword(username string, roleId uint) (database.User, error)
     IsUserAgent(userId uint) (*bool, error)
     IsExist(userId uint) (bool, error)
+    FindByUserId(userId string) (database.User, error)
 	WithTrx(trxHandle *gorm.DB) userRepository
 }
 
@@ -64,6 +65,11 @@ func (u userRepository) IsExist(userId uint) (bool, error) {
     } else {
         return false, err
     }
+}
+func (u userRepository) FindByUserId(userId string) (database.User, error) {
+    var user database.User
+    err := u.DB.Debug().Where("id = ?", userId).First(&user).Error
+    return user, err
 }
 
 func (u userRepository) WithTrx(trxHandle *gorm.DB) userRepository {

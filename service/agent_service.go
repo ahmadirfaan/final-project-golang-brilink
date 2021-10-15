@@ -62,7 +62,7 @@ func (a *agentService) RegisterAgent(request web.RegisterAgentRequest) error {
 	}
 	user := database.User{
 		RoleId:   1,
-		AgentId:  &agent.Id,
+		AgentId:  agent.Id,
 		Username: request.Username,
 		Password: utils.HashPassword(request.Password),
 	}

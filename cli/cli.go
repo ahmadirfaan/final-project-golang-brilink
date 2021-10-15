@@ -50,7 +50,7 @@ func (cli *Cli) Run(application *app.Application) {
 	loginService := service.NewLoginService(userRepo)
 	agentService := service.NewAgentService(agentRepo, userRepo, districtRepo, db)
 	transactionService := service.NewTransactionService(
-        transactionRepo, transactionTypeRepo, districtRepo, userRepo, db)
+        transactionRepo, transactionTypeRepo, districtRepo, userRepo, agentRepo, db)
 
 	// Controller
 	customerController := controller.NewCustomerController(customerService)
@@ -73,6 +73,8 @@ func (cli *Cli) Run(application *app.Application) {
 	appFiber.Get("/locations/districts", locationController.GetAllDistrictsByRegencyId)
 	appFiber.Post("/transactions", transactionController.CreateTransaction)
     appFiber.Get("/transactions", transactionController.GetAllTransactionByUserId)
+    appFiber.Put("/transactions/:transactionId", transactionController.UpdateTransaction)
+    appFiber.Put("/transactions/rating/:transactionId", transactionController.GiveAgentRating)
 	route.NotFoundRoute(appFiber)
 	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 }
