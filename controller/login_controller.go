@@ -34,7 +34,7 @@ func (cs loginController) Login(c *fiber.Ctx) error {
     }
 
     user, err := cs.LoginService.Login(login)
-    if err != nil || user.Id == 0 {
+    if err != nil || user.Id == nil {
         if errors.As(err, &validator.ValidationErrors{}) {
             return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
                 "code":    fiber.StatusBadRequest,

@@ -2,7 +2,7 @@ name: Build and Deploy to GKE
 on:
   push:
     branches:
-      - main
+      - master
 env:
     PROJECT_ID: ${{ secrets.GKE_PROJECT }}
     JWT_SECRET: ${{ secrets.JWT_SECRET }}
@@ -15,11 +15,11 @@ env:
     GKE_CLUSTER: backend-gke-cluster
     GKE_REGION: asia-east1
     TEAM_NAME: ${{ secrets.TEAM_NAME }}
-    MINIO_ENDPOINT: storage.googleapis.com
-    MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-    MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-    MINIO_REGION: US-EAST1
-    MINIO_BUCKET: ${{ secrets.TEAM_NAME }}-rakamin
+#    MINIO_ENDPOINT: storage.googleapis.com
+#    MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+#    MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+#    MINIO_REGION: US-EAST1
+#    MINIO_BUCKET: ${{ secrets.TEAM_NAME }}-rakamin
 
 jobs:
     setup-build-publish-deploy:

@@ -47,8 +47,8 @@ func (c *customerService) RegisterCustomer(request web.RegisterCustomerRequest) 
 	}
 	// log.Println("Ini Harusnya Tidak Error: ", request)
 	customer := database.Customer{
-		Name:        request.Name,
-		NoHandphone: request.NoHandphone,
+		Name:        &request.Name,
+		NoHandphone: &request.NoHandphone,
 	}
 	// log.Println("Ini Customer sebelum di save: ", customer)
 	customer, err = c.customerRepository.WithTrx(tx).Save(customer)

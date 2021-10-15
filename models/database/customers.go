@@ -7,10 +7,10 @@ import (
 )
 
 type Customer struct {
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
-	Id          uint           `gorm:"autoIncrement;primary key"`
-	Name        string         `gorm:"varchar(255); not null"`
-	NoHandphone string         `gorm:"varchar(12);not null"`
+	CreatedAt   time.Time      `json:"-"`
+	UpdatedAt   time.Time      `json:"-"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
+	Id          uint           `gorm:"autoIncrement;primary key" json:"-"`
+	Name        *string         `gorm:"varchar(255);not null"`
+	NoHandphone *string         `gorm:"varchar(12);not null"`
 }
