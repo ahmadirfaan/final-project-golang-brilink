@@ -6,11 +6,11 @@ import (
 )
 
 type TransactionType struct {
-	CreatedAt                time.Time
-	UpdatedAt                time.Time
-	DeletedAt                gorm.DeletedAt `gorm:"index"`
-	Id                       uint           `gorm:"autoIncrement;primary key"`
-	ServiceTypeTransactionId uint
-	ServiceTypeTransaction   ServiceTypeTransaction `gorm:"foreignkey:ServiceTypeTransactionId;references:Id;not null""`
-	NameTypeTransaction      string                 `gorm:"varchar(255);not null"`
+	CreatedAt                time.Time              `json:"-"`
+	UpdatedAt                time.Time              `json:"-"`
+	DeletedAt                gorm.DeletedAt         `gorm:"index" json:"-"`
+	Id                       *uint                  `gorm:"autoIncrement;primary key" json:"-"`
+	ServiceTypeTransactionId uint                   `json:"-"`
+	ServiceTypeTransaction   ServiceTypeTransaction `gorm:"foreignkey:ServiceTypeTransactionId;references:Id" json:"serviceTypeTransaction"`
+	NameTypeTransaction      string                 `gorm:"varchar(255);not null" json:"nameTransactionType"`
 }

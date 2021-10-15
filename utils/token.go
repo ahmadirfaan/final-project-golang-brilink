@@ -1,9 +1,13 @@
 package utils
 
 import (
+    "errors"
+    "github.com/gofiber/fiber/v2"
     "github.com/golang-jwt/jwt/v4"
     "github.com/itp-backend/backend-b-antar-jemput/app"
     "github.com/itp-backend/backend-b-antar-jemput/models/database"
+    "strconv"
+    "strings"
     "time"
 )
 
@@ -18,8 +22,6 @@ func GenerateToken(user database.User) (*string, error) {
     token := jwt.New(jwt.SigningMethodHS256)
     claims := token.Claims.(jwt.MapClaims)
     claims["sub"] = 1
-    claims["roleId"] = user.Role.Id
-    claims["roleName"] = user.Role.Role
     claims["userId"] = user.Id
     claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
     t, err := token.SignedString([]byte(jwtSecretKey))
@@ -27,4 +29,20 @@ func GenerateToken(user database.User) (*string, error) {
         return nil, err
     }
     return &t, err
+}
+
+func ExtractToken(c *fiber.Ctx) (string, error) {
+    appFiber := app.Init()
+    tokenString := c.Get("Authorization")
+    tokenString = strings.ReplaceAll(tokenString, " ", "")
+    tokenString = strings.ReplaceAll(tokenString, "Bearer", "")
+    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+            return nil, errors.New("unexpected signing method")
+        }
+        return []byte(appFiber.Config.JWTSecret), nil
+    })
+    claims, _ := token.Claims.(jwt.MapClaims)
+    userId := claims["userId"].(float64)
+    return strconv.Itoa(int(userId)), err
 }

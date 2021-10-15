@@ -1,3 +1,5 @@
+github.com/agrison/go-commons-lang v0.0.0-20200208220349-58e9fcb95174 h1:ExNQbrN2sYVsz5vDpV0wfFAu2gGpcnVewOXY9qpIjA8=
+github.com/agrison/go-commons-lang v0.0.0-20200208220349-58e9fcb95174/go.mod h1:u+Zwm0OKtJAGx+DXcmp2NNwZ0GKtV80ipbF/uhKhQdw=
 github.com/andybalholm/brotli v1.0.2/go.mod h1:loMXtMfwqflxFJPmdbJO0a3KNoPuLBgiu3qAvBg8x/Y=
 github.com/andybalholm/brotli v1.0.3 h1:fpcw+r1N1h0Poc1F/pHbW40cUm/lMEQslZtCkBQ0UnM=
 github.com/andybalholm/brotli v1.0.3/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=

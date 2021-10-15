@@ -17,13 +17,16 @@ type AgentService interface {
 type agentService struct {
 	agentRepository repositories.AgentRepository
 	userRepository  repositories.UserRepository
+    districtRepository repositories.DistrictRepository
 	DB              *gorm.DB
 }
 
-func NewAgentService(ar repositories.AgentRepository, ur repositories.UserRepository, db *gorm.DB) AgentService {
+func NewAgentService(ar repositories.AgentRepository,
+    ur repositories.UserRepository, dr repositories.DistrictRepository ,db *gorm.DB) AgentService {
 	return &agentService{
 		agentRepository: ar,
 		userRepository:  ur,
+        districtRepository: dr,
 		DB:              db,
 	}
 }
@@ -33,6 +36,10 @@ func (a *agentService) RegisterAgent(request web.RegisterAgentRequest) error {
 	if err != nil {
 		return err
 	}
+    _, err = a.districtRepository.FindById(request.DistrictId)
+    if err != nil {
+        return err
+    }
 	tx := a.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
