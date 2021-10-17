@@ -1,7 +1,8 @@
 package repositories
 
 import (
-	"log"
+    "errors"
+    "log"
 
 	"github.com/itp-backend/backend-b-antar-jemput/models/database"
 	"gorm.io/gorm"
@@ -9,6 +10,8 @@ import (
 
 type AgentRepository interface {
 	Save(agent database.Agent) (database.Agent, error)
+    GiveRatingAgent(agentId uint, agentRating float32, totalReviewCustomer uint) error
+    FindByAgentId(agentId uint) (*database.Agent, error)
 	WithTrx(trxHandle *gorm.DB) agentRepo
 }
 
@@ -26,6 +29,27 @@ func (a agentRepo) Save(agent database.Agent) (database.Agent, error) {
 	err := a.DB.Debug().Create(&agent).Error
 	log.Printf("Agent:%+v\n", agent)
 	return agent, err
+}
+
+func (a agentRepo) GiveRatingAgent(agentId uint, agentRating float32, totalReviewCustomer uint) error {
+    var agent database.Agent
+    err := a.DB.Debug().Model(&agent).Where(" id = ?", agentId).
+        Update("agent_rating", agentRating).Update("total_review_customer", totalReviewCustomer).Error
+    return err
+
+}
+
+func (a agentRepo) FindByAgentId(agentId uint) (*database.Agent, error) {
+    log.Println("Agent Id Di Anjinglah : ")
+    var agent *database.Agent
+    err := a.DB.Debug().Where("id = ?", agentId).First(&agent).Error
+    log.Println("Agent Id Di Repositories : ", agent.Id)
+    if agent.Id != nil {
+        return agent, err
+    } else {
+        return agent, errors.New("No found record agentId")
+    }
+
 }
 
 func (a agentRepo) WithTrx(trxHandle *gorm.DB) agentRepo {

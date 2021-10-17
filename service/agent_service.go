@@ -12,22 +12,23 @@ import (
 
 type AgentService interface {
 	RegisterAgent(request web.RegisterAgentRequest) error
+	FindByDistrictId(districtId string) ([]database.User, error)
 }
 
 type agentService struct {
-	agentRepository repositories.AgentRepository
-	userRepository  repositories.UserRepository
-    districtRepository repositories.DistrictRepository
-	DB              *gorm.DB
+	agentRepository    repositories.AgentRepository
+	userRepository     repositories.UserRepository
+	districtRepository repositories.DistrictRepository
+	DB                 *gorm.DB
 }
 
 func NewAgentService(ar repositories.AgentRepository,
-    ur repositories.UserRepository, dr repositories.DistrictRepository ,db *gorm.DB) AgentService {
+	ur repositories.UserRepository, dr repositories.DistrictRepository, db *gorm.DB) AgentService {
 	return &agentService{
-		agentRepository: ar,
-		userRepository:  ur,
-        districtRepository: dr,
-		DB:              db,
+		agentRepository:    ar,
+		userRepository:     ur,
+		districtRepository: dr,
+		DB:                 db,
 	}
 }
 
@@ -36,10 +37,10 @@ func (a *agentService) RegisterAgent(request web.RegisterAgentRequest) error {
 	if err != nil {
 		return err
 	}
-    _, err = a.districtRepository.FindById(request.DistrictId)
-    if err != nil {
-        return err
-    }
+	_, err = a.districtRepository.FindById(request.DistrictId)
+	if err != nil {
+		return err
+	}
 	tx := a.DB.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -62,7 +63,7 @@ func (a *agentService) RegisterAgent(request web.RegisterAgentRequest) error {
 	}
 	user := database.User{
 		RoleId:   1,
-		AgentId:  &agent.Id,
+		AgentId:  agent.Id,
 		Username: request.Username,
 		Password: utils.HashPassword(request.Password),
 	}
@@ -73,4 +74,17 @@ func (a *agentService) RegisterAgent(request web.RegisterAgentRequest) error {
 		return err
 	}
 	return tx.Commit().Error
+}
+
+func (a *agentService) FindByDistrictId(districtId string) ([]database.User, error) {
+	_, err := a.districtRepository.FindById(districtId)
+	if err != nil {
+		return nil, err
+	}
+	userAgent, err := a.userRepository.FindAgentByDistrictId(districtId)
+	if err != nil {
+		return nil, err
+	}
+	return userAgent, err
+
 }

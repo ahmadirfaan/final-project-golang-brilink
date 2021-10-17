@@ -13,7 +13,8 @@
  - [x] Find Transactions By IdAgent
 
 **List pengerjaan pada R3:**
-- [ ] Transaction Confirmed
-- [ ] Transaction Canceled
-- [ ] Transaction Done + Give Rating
-- [ ] Find Agent
+- [x] Change Status Transaction to Transaction Confirmed
+- [x] Change Status Transaction to Transaction Canceled
+- [x] Change Status Transaction to Done
+- [x] Give Rating
+- [x] Find Agent

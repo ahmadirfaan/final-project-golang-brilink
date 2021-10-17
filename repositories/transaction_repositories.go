@@ -3,13 +3,16 @@ package repositories
 import (
     "log"
 
-	"github.com/itp-backend/backend-b-antar-jemput/models/database"
-	"gorm.io/gorm"
+    "github.com/itp-backend/backend-b-antar-jemput/models/database"
+    "gorm.io/gorm"
 )
 
 type TransactionRepository interface {
 	Save(transaction database.Transactions) (database.Transactions, error)
 	FindTransactionWithUserId(userId string) ([]database.Transactions, error)
+    UpdateStatusTransaction(transactionId string, statusTransaction uint8) error
+    FindTransactionById(transactionId string) (*database.Transactions, error)
+    GiveRating(transactionId string, rating uint8) error
 	WithTrx(trxHandle *gorm.DB) transactionRepo
 }
 
@@ -36,6 +39,25 @@ func (t transactionRepo) FindTransactionWithUserId(userId string) ([]database.Tr
         Preload("TransactionType").Preload("TransactionType.ServiceTypeTransaction").
         Preload("UserAgent").Preload("UserAgent.Agent").Find(&transactionList).Error
 	return transactionList, err
+}
+
+func (t transactionRepo) GiveRating(transactionId string, rating uint8) error {
+    var transaction *database.Transactions
+    err := t.DB.Debug().Model(&transaction).Where("id = ?", transactionId).Update("rating", rating).Error
+    return err
+}
+
+func (t transactionRepo) FindTransactionById(transactionId string) (*database.Transactions, error) {
+    var transaction *database.Transactions
+    err := t.DB.Debug().Where("id = ?", transactionId).First(&transaction).Error
+    return transaction, err
+}
+
+func (t transactionRepo) UpdateStatusTransaction(transactionId string, statusTransaction uint8) error {
+    var transaction database.Transactions
+    err := t.DB.Debug().Model(&transaction).Where(" id = ?", transactionId).
+        Update("status_transaction", statusTransaction).Error
+    return err
 }
 
 func (t transactionRepo) WithTrx(trxHandle *gorm.DB) transactionRepo {

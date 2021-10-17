@@ -1,18 +1,20 @@
 package controller
 
 import (
-    "errors"
-    "github.com/go-playground/validator"
-    "github.com/go-sql-driver/mysql"
-    "github.com/gofiber/fiber/v2"
-    "github.com/itp-backend/backend-b-antar-jemput/models/web"
-    "github.com/itp-backend/backend-b-antar-jemput/service"
-    "github.com/itp-backend/backend-b-antar-jemput/utils"
+	"errors"
+	"github.com/go-playground/validator"
+	"github.com/gofiber/fiber/v2"
+	"github.com/itp-backend/backend-b-antar-jemput/models/web"
+	"github.com/itp-backend/backend-b-antar-jemput/service"
+	"github.com/itp-backend/backend-b-antar-jemput/utils"
+	"strconv"
 )
 
 type TransactionController interface {
 	CreateTransaction(c *fiber.Ctx) error
-    GetAllTransactionByUserId(c *fiber.Ctx) error
+	GetAllTransactionByUserId(c *fiber.Ctx) error
+	UpdateTransaction(c *fiber.Ctx) error
+    GiveAgentRating(c *fiber.Ctx) error
 }
 
 type transactionController struct {
@@ -25,7 +27,16 @@ func NewTransactionController(s service.TransactionService) TransactionControlle
 	}
 }
 
-func (ts transactionController) GetAllTransactionByUserId(c *fiber.Ctx) error {
+func (ts transactionController) GiveAgentRating(c *fiber.Ctx) error {
+    var request web.RequestRating
+    transactionId := c.Params("transactionId")
+    if err := c.BodyParser(&request); err != nil {
+        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "code":    fiber.StatusBadRequest,
+            "message": "Error for handling your request",
+            "data":    nil,
+        })
+    }
     userId, err := utils.ExtractToken(c)
     if err != nil {
         return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -34,27 +45,117 @@ func (ts transactionController) GetAllTransactionByUserId(c *fiber.Ctx) error {
             "data":    nil,
         })
     }
-    transactions, err := ts.TransactionService.GetAllTransactionByUserId(userId)
     if err != nil {
-      return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-          "code":    fiber.StatusBadRequest,
-          "message": err.Error(),
-          "data":    nil,
-      })
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "code":    fiber.StatusInternalServerError,
+            "message": "Internal Server Error",
+            "data":    nil,
+        })
     }
-    if len(transactions) == 0 {
-      return c.Status(fiber.StatusOK).JSON(fiber.Map{
-          "code":    fiber.StatusOK,
-          "message": "No Transaction Data",
-          "data":    nil,
-      })
-    } else {
-      return c.Status(fiber.StatusOK).JSON(fiber.Map{
-          "code":    fiber.StatusOK,
-          "message": nil,
-          "data":    transactions,
-      })
+    code, err := ts.TransactionService.GiveRatingTransaction(request, userId, transactionId)
+    if err != nil {
+        if errors.As(err, &validator.ValidationErrors{}) {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code":    fiber.StatusBadRequest,
+                "message": utils.ValidatorErrors(err),
+                "data":    nil,
+            })
+        } else {
+            return c.Status(code).JSON(fiber.Map{
+                "code":    code,
+                "message": err.Error(),
+                "data":    nil,
+            })
+        }
     }
+    return c.Status(fiber.StatusOK).JSON(fiber.Map{
+        "code":    fiber.StatusOK,
+        "message": "Thank you for giving rating",
+        "data":    nil,
+    })
+}
+
+func (ts transactionController) GetAllTransactionByUserId(c *fiber.Ctx) error {
+	userId, err := utils.ExtractToken(c)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"code":    fiber.StatusInternalServerError,
+			"message": "Internal Server Error",
+			"data":    nil,
+		})
+	}
+	transactions, err := ts.TransactionService.GetAllTransactionByUserId(userId)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    fiber.StatusBadRequest,
+			"message": err.Error(),
+			"data":    nil,
+		})
+	}
+	if len(transactions) == 0 {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"code":    fiber.StatusOK,
+			"message": "No Transaction Data",
+			"data":    transactions,
+		})
+	} else {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"code":    fiber.StatusOK,
+			"message": nil,
+			"data":    transactions,
+		})
+	}
+}
+
+func (ts transactionController) UpdateTransaction(c *fiber.Ctx) error {
+	var request web.ChangeTransactionRequest
+	transactionId := c.Params("transactionId")
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"code":    fiber.StatusBadRequest,
+			"message": "Error for handling your request",
+			"data":    nil,
+		})
+	}
+	userIdToken, err := utils.ExtractToken(c)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"code":    fiber.StatusInternalServerError,
+			"message": "Internal Server Error",
+			"data":    nil,
+		})
+	}
+	userId, _ := strconv.Atoi(userIdToken)
+	code, err := ts.TransactionService.ChangeStatusTransaction(transactionId, uint(userId), request)
+	if err != nil {
+		if errors.As(err, &validator.ValidationErrors{}) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    fiber.StatusBadRequest,
+				"message": utils.ValidatorErrors(err),
+				"data":    nil,
+			})
+		} else {
+			return c.Status(code).JSON(fiber.Map{
+				"code":    code,
+				"message": err.Error(),
+				"data":    nil,
+			})
+		}
+	}
+	var message string
+	switch request.StatusTransaction {
+	case 1:
+		message = "Success Change to Agent on the way "
+	case 2:
+		message = "Success Change Status Transaction to Canceled"
+	case 3:
+		message = "Success Change to Done, Thank you for transaction"
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"code":    fiber.StatusOK,
+		"message": message,
+		"data":    nil,
+	})
 }
 
 func (ts transactionController) CreateTransaction(c *fiber.Ctx) error {
@@ -66,48 +167,41 @@ func (ts transactionController) CreateTransaction(c *fiber.Ctx) error {
 			"data":    nil,
 		})
 	}
-    userId, err := utils.ExtractToken(c)
-    if err != nil {
-        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-            "code":    fiber.StatusInternalServerError,
-            "message": "Internal Server Error",
-            "data":    nil,
-        })
-    }
-    isAgent, err := ts.TransactionService.IsUserAgent(userId)
-    if *isAgent {
-        return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-            "code": fiber.StatusForbidden,
-            "message": "You're not appropriate to do create transactions",
-            "data": nil,
-        })
-    }
+	userId, err := utils.ExtractToken(c)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"code":    fiber.StatusInternalServerError,
+			"message": "Internal Server Error",
+			"data":    nil,
+		})
+	}
+	isAgent, err := ts.TransactionService.IsUserAgent(userId)
+	if *isAgent {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"code":    fiber.StatusForbidden,
+			"message": "You're not appropriate to do create transactions",
+			"data":    nil,
+		})
+	}
 	err = ts.TransactionService.CreateTransaction(transaction, userId)
 	if err != nil {
-		var mysqlErr *mysql.MySQLError
 		if errors.As(err, &validator.ValidationErrors{}) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"code":    fiber.StatusBadRequest,
 				"message": utils.ValidatorErrors(err),
 				"data":    nil,
 			})
-		} else if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
-			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-				"code":    fiber.StatusConflict,
-				"message": "Username Already is exist",
+		} else {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    fiber.StatusBadRequest,
+				"message": err.Error(),
 				"data":    nil,
 			})
-		} else {
-            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-                "code": fiber.StatusBadRequest,
-                "message": err.Error(),
-                "data": nil,
-            })
-        }
+		}
 	}
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"code":    fiber.StatusCreated,
 		"message": "Transaksi Diterima ",
-		"data": nil,
+		"data":    nil,
 	})
 }
