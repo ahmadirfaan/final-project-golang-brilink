@@ -76,6 +76,7 @@ func (cli *Cli) Run(application *app.Application) {
 	appFiber.Put("/transactions/:transactionId", transactionController.UpdateTransaction)
 	appFiber.Put("/transactions/rating/:transactionId", transactionController.GiveAgentRating)
 	appFiber.Get("/agents", agentController.FindAgentByDistrictId)
+    appFiber.Delete("/transactions/:transactionId", transactionController.DeleteTransactionById)
 	route.NotFoundRoute(appFiber)
 	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 }

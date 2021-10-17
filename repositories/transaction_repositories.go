@@ -12,6 +12,7 @@ type TransactionRepository interface {
 	FindTransactionWithUserId(userId string) ([]database.Transactions, error)
     UpdateStatusTransaction(transactionId string, statusTransaction uint8) error
     FindTransactionById(transactionId string) (*database.Transactions, error)
+    DeleteTransactionById(transactionId string) error
     GiveRating(transactionId string, rating uint8) error
 	WithTrx(trxHandle *gorm.DB) transactionRepo
 }
@@ -57,6 +58,12 @@ func (t transactionRepo) UpdateStatusTransaction(transactionId string, statusTra
     var transaction database.Transactions
     err := t.DB.Debug().Model(&transaction).Where(" id = ?", transactionId).
         Update("status_transaction", statusTransaction).Error
+    return err
+}
+
+func (t transactionRepo) DeleteTransactionById(transactionId string) error {
+    var transaction database.Transactions
+    err := t.DB.Debug().Model(&transaction).Delete(&transaction, transactionId).Error
     return err
 }
 

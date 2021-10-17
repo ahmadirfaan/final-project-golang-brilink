@@ -15,6 +15,7 @@ type TransactionController interface {
 	GetAllTransactionByUserId(c *fiber.Ctx) error
 	UpdateTransaction(c *fiber.Ctx) error
     GiveAgentRating(c *fiber.Ctx) error
+    DeleteTransactionById(c *fiber.Ctx) error
 }
 
 type transactionController struct {
@@ -27,6 +28,41 @@ func NewTransactionController(s service.TransactionService) TransactionControlle
 	}
 }
 
+func (ts transactionController) DeleteTransactionById(c *fiber.Ctx) error {
+    transactionId := c.Params("transactionId")
+    userIdToken, err := utils.ExtractToken(c)
+    if err != nil {
+        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "code":    fiber.StatusInternalServerError,
+            "message": "Internal Server Error",
+            "data":    nil,
+        })
+    }
+    code, err := ts.TransactionService.DeleteTransaction(transactionId, userIdToken)
+    if err != nil {
+        if errors.As(err, &validator.ValidationErrors{}) {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code":    fiber.StatusBadRequest,
+                "message": utils.ValidatorErrors(err),
+                "data":    nil,
+            })
+        } else {
+            return c.Status(code).JSON(fiber.Map{
+                "code":    code,
+                "message": err.Error(),
+                "data":    nil,
+            })
+        }
+    }
+    return c.Status(fiber.StatusOK).JSON(fiber.Map{
+        "code":    fiber.StatusOK,
+        "message": "Success Delete Transaction",
+        "data":    nil,
+    })
+
+
+}
+
 func (ts transactionController) GiveAgentRating(c *fiber.Ctx) error {
     var request web.RequestRating
     transactionId := c.Params("transactionId")
@@ -37,7 +73,7 @@ func (ts transactionController) GiveAgentRating(c *fiber.Ctx) error {
             "data":    nil,
         })
     }
-    userId, err := utils.ExtractToken(c)
+    userId,err := utils.ExtractToken(c)
     if err != nil {
         return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
             "code":    fiber.StatusInternalServerError,

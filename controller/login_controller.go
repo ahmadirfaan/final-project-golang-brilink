@@ -52,7 +52,7 @@ func (cs loginController) Login(c *fiber.Ctx) error {
 
     }
 
-    token, err := utils.GenerateToken(user)
+    token, expire, err := utils.GenerateToken(user)
     if err != nil { //Error that because of generates token
         return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
             "code":    fiber.StatusInternalServerError,
@@ -65,6 +65,7 @@ func (cs loginController) Login(c *fiber.Ctx) error {
         "message": "Sucess Login",
         "data": fiber.Map{
             "accessToken": token,
+            "expiredAt": expire,
         },
     })
 }
