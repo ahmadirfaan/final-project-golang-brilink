@@ -42,7 +42,7 @@ func (cli *Cli) Run(application *app.Application) {
 	agentRepo := repositories.NewAgentRepository(db)
 	districtRepo := repositories.NewDistrictRepository(db)
 	transactionRepo := repositories.NewTransactionRepository(db)
-    transactionTypeRepo := repositories.NewTransactionTypeRepository(db)
+	transactionTypeRepo := repositories.NewTransactionTypeRepository(db)
 
 	// Service
 	customerService := service.NewCustomerService(customerRepo, userRepo, db)
@@ -50,7 +50,7 @@ func (cli *Cli) Run(application *app.Application) {
 	loginService := service.NewLoginService(userRepo)
 	agentService := service.NewAgentService(agentRepo, userRepo, districtRepo, db)
 	transactionService := service.NewTransactionService(
-        transactionRepo, transactionTypeRepo, districtRepo, userRepo, agentRepo, db)
+		transactionRepo, transactionTypeRepo, districtRepo, userRepo, agentRepo, db)
 
 	// Controller
 	customerController := controller.NewCustomerController(customerService)
@@ -65,16 +65,17 @@ func (cli *Cli) Run(application *app.Application) {
 	appFiber.Post("/login", loginController.Login)
 	appFiber.Post("/customers", customerController.RegisterCustomer)
 	appFiber.Post("/agents", agentController.RegisterAgent)
-    appFiber.Get("/", loginController.WelcomingAPI)
+	appFiber.Get("/", loginController.WelcomingAPI)
 	// Set Middleware Auth with JWT Config
 	middleware.MiddlewareAuth(appFiber)
 	appFiber.Get("/locations/provinces", locationController.GetAllProvinces)
 	appFiber.Get("/locations", locationController.GetAllRegenciesByProvinceId)
 	appFiber.Get("/locations/districts", locationController.GetAllDistrictsByRegencyId)
 	appFiber.Post("/transactions", transactionController.CreateTransaction)
-    appFiber.Get("/transactions", transactionController.GetAllTransactionByUserId)
-    appFiber.Put("/transactions/:transactionId", transactionController.UpdateTransaction)
-    appFiber.Put("/transactions/rating/:transactionId", transactionController.GiveAgentRating)
+	appFiber.Get("/transactions", transactionController.GetAllTransactionByUserId)
+	appFiber.Put("/transactions/:transactionId", transactionController.UpdateTransaction)
+	appFiber.Put("/transactions/rating/:transactionId", transactionController.GiveAgentRating)
+	appFiber.Get("/agents", agentController.FindAgentByDistrictId)
 	route.NotFoundRoute(appFiber)
 	StartServerWithGracefulShutdown(appFiber, application.Config.AppPort)
 }

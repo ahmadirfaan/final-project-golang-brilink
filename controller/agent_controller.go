@@ -12,6 +12,7 @@ import (
 
 type AgentController interface {
 	RegisterAgent(c *fiber.Ctx) error
+    FindAgentByDistrictId(c *fiber.Ctx) error
 }
 
 type agentController struct {
@@ -64,4 +65,30 @@ func (as agentController) RegisterAgent(c *fiber.Ctx) error {
 		"message": " Sukses Membuat Akun",
 		"data": nil,
 	})
+}
+
+func (as agentController) FindAgentByDistrictId(c *fiber.Ctx) error {
+    districtId := c.Query("districtId")
+    users, err := as.AgentService.FindByDistrictId(districtId)
+    if err != nil {
+        if errors.As(err, &validator.ValidationErrors{}) {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code":    fiber.StatusBadRequest,
+                "message": utils.ValidatorErrors(err),
+                "data":    nil,
+            })
+        } else {
+            return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                "code": fiber.StatusBadRequest,
+                "message": err.Error(),
+                "data": nil,
+            })
+        }
+    }
+
+    return c.Status(fiber.StatusOK).JSON(fiber.Map{
+        "code":    fiber.StatusOK,
+        "message": nil,
+        "data": users,
+    })
 }

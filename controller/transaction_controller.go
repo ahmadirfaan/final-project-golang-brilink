@@ -96,7 +96,7 @@ func (ts transactionController) GetAllTransactionByUserId(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"code":    fiber.StatusOK,
 			"message": "No Transaction Data",
-			"data":    nil,
+			"data":    transactions,
 		})
 	} else {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
