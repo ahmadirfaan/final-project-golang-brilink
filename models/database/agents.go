@@ -16,5 +16,5 @@ type Agent struct {
 	Address             string         `gorm:"type:text;not null" json:"address"`
 	NoHandphone         string         `gorm:"type:varchar(12);not null" json:"noHandphone"`
 	AgentRating         *float32       `gorm:"type:float" json:"agentRating,omitempty"`
-	TotalReviewCustomer uint           `json:"totalReviewCustomer,omitempty"`
+	TotalReviewCustomer uint           `json:"totalReviewTransactions,omitempty"`
 }

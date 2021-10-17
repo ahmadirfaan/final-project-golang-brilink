@@ -15,6 +15,7 @@ type TransactionService interface {
 	CreateTransaction(request web.CreateTransactionRequest, customerId string) error
 	GetAllTransactionByUserId(userId string) ([]database.Transactions, error)
 	IsUserAgent(userId string) (*bool, error)
+    DeleteTransaction(transactionId string, userId string) (int, error)
 	GiveRatingTransaction(request web.RequestRating, userId string, transactionId string) (int, error)
 	ChangeStatusTransaction(transactionId string, userId uint, request web.ChangeTransactionRequest) (int, error)
 }
@@ -228,9 +229,41 @@ func (t *transactionService) validateUserGiveRating(userId string, transactionId
 		return fiber.StatusForbidden, errors.New("you're not allowed change transaction")
 	}
 	if isUserAgent, _ := t.IsUserAgent(userId); *isUserAgent {
-		return fiber.StatusForbidden, errors.New("must user customer to can giver taiing")
+		return fiber.StatusForbidden, errors.New("must user customer to can giver rating")
 	}
 	return fiber.StatusOK, nil
+}
+
+func (t *transactionService) DeleteTransaction(transactionId string, userId string) (int, error) {
+    code, err := t.validateDeleteTransaction(transactionId, userId)
+    defaultReturn := 200
+    if err != nil {
+        return code, err
+    }
+    err = t.transactionsRepository.DeleteTransactionById(transactionId)
+    if err != nil {
+        return fiber.StatusInternalServerError, err
+    }
+    return defaultReturn, err
+}
+
+func (t *transactionService) validateDeleteTransaction(transactionId string, userId string) (int, error) {
+    transaction, err := t.transactionsRepository.FindTransactionById(transactionId)
+    if err != nil {
+        return fiber.StatusBadRequest, err
+    }
+    userIdInt, _ := strconv.Atoi(userId)
+    if isUserDoTransaction := isUserDoTransaction(*transaction, uint(userIdInt)); !isUserDoTransaction {
+        return fiber.StatusForbidden, errors.New("you're not allowed change transaction")
+    }
+    if isUserAgent, _ := t.IsUserAgent(userId); !*isUserAgent {
+        return fiber.StatusForbidden, errors.New("must user agent to can delete transaction")
+    }
+    if transaction.StatusTransaction != uint8(2) {
+        return fiber.StatusBadRequest, errors.New("must canceled transaction to be deleted")
+    }
+
+    return fiber.StatusOK, nil
 }
 
 func (t *transactionService) validateUserForTransaction(request web.CreateTransactionRequest, customerId string) error {
