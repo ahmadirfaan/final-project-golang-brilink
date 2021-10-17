@@ -66,11 +66,11 @@ func (cli *Cli) Run(application *app.Application) {
 	appFiber.Post("/customers", customerController.RegisterCustomer)
 	appFiber.Post("/agents", agentController.RegisterAgent)
 	appFiber.Get("/", loginController.WelcomingAPI)
-	// Set Middleware Auth with JWT Config
+    appFiber.Get("/locations/districts", locationController.GetAllDistrictsByRegencyId)
+    appFiber.Get("/locations/provinces", locationController.GetAllProvinces)
+    appFiber.Get("/locations", locationController.GetAllRegenciesByProvinceId)
+    // Set Middleware Auth with JWT Config
 	middleware.MiddlewareAuth(appFiber)
-	appFiber.Get("/locations/provinces", locationController.GetAllProvinces)
-	appFiber.Get("/locations", locationController.GetAllRegenciesByProvinceId)
-	appFiber.Get("/locations/districts", locationController.GetAllDistrictsByRegencyId)
 	appFiber.Post("/transactions", transactionController.CreateTransaction)
 	appFiber.Get("/transactions", transactionController.GetAllTransactionByUserId)
 	appFiber.Put("/transactions/:transactionId", transactionController.UpdateTransaction)
