@@ -256,9 +256,6 @@ func (t *transactionService) validateDeleteTransaction(transactionId string, use
     if isUserDoTransaction := isUserDoTransaction(*transaction, uint(userIdInt)); !isUserDoTransaction {
         return fiber.StatusForbidden, errors.New("you're not allowed change transaction")
     }
-    if isUserAgent, _ := t.IsUserAgent(userId); !*isUserAgent {
-        return fiber.StatusForbidden, errors.New("must user agent to can delete transaction")
-    }
     if transaction.StatusTransaction != uint8(2) {
         return fiber.StatusBadRequest, errors.New("must canceled transaction to be deleted")
     }
