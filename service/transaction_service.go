@@ -143,11 +143,11 @@ func (t *transactionService) GiveRatingTransaction(request web.RequestRating, us
 }
 
 func (t *transactionService) IsUserAgent(userId string) (*bool, error) {
-	customerId, err := strconv.ParseUint(userId, 10, 32)
+	agentID, err := strconv.ParseUint(userId, 10, 64)
 	if err != nil {
 		return nil, errors.New("error handling for converstion customerId")
 	}
-	isAgent, err := t.userRepository.IsUserAgent(uint(customerId))
+	isAgent, err := t.userRepository.IsUserAgent(uint(agentID))
 	return isAgent, err
 }
 
@@ -284,7 +284,7 @@ func (t *transactionService) validateUserForTransaction(request web.CreateTransa
 	//validate the exist is customerId
 	isExistUserCustomer, err := t.userRepository.IsExist(uint(customerIdUint))
 	//validate if the request agentId is agent
-	isNotAgent, err := t.IsUserAgent(strconv.FormatUint(uint64(request.AgentId), 32))
+        isNotAgent, err := t.IsUserAgent(strconv.FormatUint(uint64(request.AgentId), 10))
 	//validate the exist is AgentId
 	isExistUserAgent, err := t.userRepository.IsExist(request.AgentId)
 	if err != nil {
