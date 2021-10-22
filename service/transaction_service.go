@@ -111,7 +111,7 @@ func (t *transactionService) GiveRatingTransaction(request web.RequestRating, us
 		tx.Debug().Rollback()
 		return defaultError, err
 	}
-	userIdString := strconv.FormatUint(uint64(transaction.AgentId), 32)
+	userIdString := strconv.FormatUint(uint64(transaction.AgentId), 10)
 	user, err := t.userRepository.FindByUserId(userIdString)
 	if err != nil {
 		tx.Debug().Rollback()
